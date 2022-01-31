@@ -46,6 +46,7 @@ void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
 
 string Tokenizador::DelimitadoresPalabra() const
 {
+    return delimiters;
 }
 
 void Tokenizador::CasosEspeciales(const bool &nuevoCasosEspeciales)
@@ -54,6 +55,7 @@ void Tokenizador::CasosEspeciales(const bool &nuevoCasosEspeciales)
 
 bool Tokenizador::CasosEspeciales()
 {
+    return casosEspeciales;
 }
 
 void Tokenizador::PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos)
@@ -62,6 +64,7 @@ void Tokenizador::PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos
 
 bool Tokenizador::PasarAminuscSinAcentos()
 {
+    return pasarAminuscSinAcentos;
 }
 
 ostream &operator<<(ostream &os, const Tokenizador &tokenizador){
