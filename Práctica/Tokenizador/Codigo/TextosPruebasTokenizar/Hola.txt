@@ -1,0 +1,2 @@
+Se podrá modificar el carácter const de los métodos argumentos aquí descritos siempre que se 
+mantengan las características de funcionamiento previstas
