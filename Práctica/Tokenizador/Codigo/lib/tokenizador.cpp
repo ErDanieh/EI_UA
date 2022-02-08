@@ -166,6 +166,8 @@ bool Tokenizador::TokenizarDirectorio(const string &i) const
     }
 }
 
+
+
 void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
 {
     EliminarRepetidos(this->delimiters = nuevoDelimiters);

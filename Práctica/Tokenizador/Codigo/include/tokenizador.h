@@ -58,6 +58,8 @@ private:
      */
     void EliminarRepetidos(string &delimitadoresPalabra);
 
+    
+
 public:
     /**
      * @brief Construct a new Tokenizador object
