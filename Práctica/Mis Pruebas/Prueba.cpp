@@ -19,10 +19,17 @@
 
 using namespace std;
 
+typedef struct TokenF
+{
+    string token;
+    vector<bool> flags [5];
+}
+
 #define casosEspeciales true
 #define pasarAminuscSinAcentos false
 
-void Tokenizar(const string &str, list<string> &tokens)
+void
+Tokenizar(const string &str, list<string> &tokens)
 {
     unsigned t0, t1;
     t0 = clock();
