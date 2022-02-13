@@ -3,8 +3,9 @@
 const string Tokenizador::delimiters_Siempre = " \n";
 
 /**
- * TODO: Volver a poner el TonekizarFichero el mensaje de error que falta
- * TODO:
+ * TODO:Evitar salto linea en consola
+ * TODO:Implementar el automata de estados
+ * TODO:Dibujar diagrama de estados
  *
  **/
 
@@ -61,28 +62,28 @@ string Tokenizador::getMinusSinAcentos(const string &palabra) const
     {
         switch ((unsigned char)palabra[i])
         {
-        case 225: //á 
-        case 193: //Á
+        case 225: //a minuscula con acento
+        case 193: //A mayuscula con acento
             palabraAux += 'a';
             break;
-        case 233: //é
-        case 201: //É
+        case 233: //e minuscula con acento
+        case 201: //E mayuscula con acento
             palabraAux += 'e';
             break;
-        case 237: //í
-        case 205: //Í
+        case 237: //i minuscula con acento
+        case 205: //I mayuscula con acento
             palabraAux += 'i';
             break;
-        case 243: //ó
-        case 211: //Ó
+        case 243: //o minuscula con acento
+        case 211: //O mayuscula con acento
             palabraAux += 'o';
             break;
-        case 250: //ú
-        case 218: //Ú
+        case 250: //u minuscula con acento
+        case 218: //U mayuscula con acento
             palabraAux += 'u';
             break;
-        case 209: // transforma Ñ mayuscula en minuscula
-            palabraAux += 'ñ';
+        case 209: // transforma � mayuscula en minuscula
+            palabraAux += '�';
             break;
         default: //El resto de letras si son mayusculas son transformadas a minusculas
             if (palabra[i] >= 'A' && palabra[i] <= 'Z')
@@ -280,6 +281,7 @@ bool Tokenizador::PasarAminuscSinAcentos()
 {
     return this->pasarAminuscSinAcentos;
 }
+
 
 ostream &operator<<(ostream &os, const Tokenizador &tokenizador)
 {

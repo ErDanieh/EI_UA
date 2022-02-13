@@ -66,6 +66,8 @@ private:
      */
     string getMinusSinAcentos(const string &palabra) const;
 
+    string eliminaBarraN(const string &i);
+
     
 
 public:
@@ -225,6 +227,14 @@ public:
      * @return false 
      */
     bool PasarAminuscSinAcentos();
+
+    /**
+     * @brief La lista de tokens será creada a partir de los casos especiales que se defienen
+     * la implementación es mediante un automata de estados finitos.
+     * @param tokens lista de tokens 
+     * @param frase frase en la que buscar casos
+     * */
+    void TokenizarEspeciales(list <string> &tokens, string& frase)const;
 };
 
 #endif
