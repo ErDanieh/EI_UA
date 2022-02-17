@@ -1,40 +1,31 @@
-#include <iostream> 
+#include <iostream>
 #include <string>
-#include <list> 
+#include <list>
 #include "tokenizador.h"
+#include "chrono"
 
 using namespace std;
 
-///////// Comprobación de que vacíe la lista resultado
+///////// Comprobaciï¿½n de que vacï¿½e la lista resultado
 
-void imprimirListaSTL(const list<string>& cadena)
+void imprimirListaSTL(const list<string> &cadena)
 {
         list<string>::const_iterator itCadena;
-        for(itCadena=cadena.begin();itCadena!=cadena.end();itCadena++)
+        for (itCadena = cadena.begin(); itCadena != cadena.end(); itCadena++)
         {
                 cout << (*itCadena) << ", ";
         }
         cout << endl;
 }
 
-int
-main(void)
+int main(void)
 {
-	bool kCasosEspeciales = true, kpasarAminusculas = false;
+        Tokenizador a("",true,true);
+        list<string> tokens;
 
-	list<string> lt1, lt2;
-
-Tokenizador a("", true, false); 
-list<string> tokens; 
-
-a.Tokenizar("http:", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("http:////ab/", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("http:////ab.", tokens);
-	imprimirListaSTL(tokens);
-
-
+        auto start = chrono::high_resolution_clock::now();
+        a.TokenizarListaFicheros("listaFicheros.txt");
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        cout << "Tiempo de ejecuciÃ³n: " << duration.count() << " milisegundos" << endl;
 }
