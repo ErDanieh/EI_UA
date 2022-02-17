@@ -2,7 +2,6 @@
 #include <string>
 #include <list>
 #include "tokenizador.h"
-#include "chrono"
 
 using namespace std;
 
@@ -20,12 +19,12 @@ void imprimirListaSTL(const list<string> &cadena)
 
 int main(void)
 {
-        Tokenizador a("",true,true);
+        bool kCasosEspeciales = true, kpasarAminusculas = false;
+
+        list<string> lt1, lt2;
+
+        Tokenizador a("", true, true);
         list<string> tokens;
 
-        auto start = chrono::high_resolution_clock::now();
-        a.TokenizarListaFicheros("listaFicheros.txt");
-        auto end = chrono::high_resolution_clock::now();
-        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-        cout << "Tiempo de ejecución: " << duration.count() << " milisegundos" << endl;
+        a.Tokenizar("h", tokens);
 }

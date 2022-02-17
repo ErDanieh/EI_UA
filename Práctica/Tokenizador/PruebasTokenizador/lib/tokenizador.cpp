@@ -81,13 +81,14 @@ string Tokenizador::getMinusSinAcentos(const string &palabra) const
         case 218: // U mayuscula con acento
             palabraAux += 'u';
             break;
-        case 209: // transforma ñ mayuscula en minuscula
+        case 209: // transforma Ñ mayuscula en minuscula
             palabraAux += 'ñ';
             break;
         default: // El resto de letras si son mayusculas son transformadas a minusculas
             if (palabra[i] >= 'A' && palabra[i] <= 'Z')
                 palabraAux += tolower(palabra[i]);
             else
+                //cout<<sizeof(palabra[i])<<endl;
                 palabraAux += palabra[i];
             break;
         }
@@ -97,35 +98,29 @@ string Tokenizador::getMinusSinAcentos(const string &palabra) const
 
 void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
 {
-    // Se limpia la lista de tokens
-    // if (!tokens.empty())
-    // tokens.clear();
-#if 0
-    if (casosEspeciales)
-        UsandoCasosEspeciales(tokens, str);
-#endif
+    if (!tokens.empty())
+        tokens.clear();
+    
+    // if (casosEspeciales)
+    // UsandoCasosEspeciales(tokens, str);
+
     // else
     //{
 
     string token;
-    string tok;
     string::size_type lastPos = str.find_first_not_of(delimiters, 0);
     string::size_type pos = str.find_first_of(delimiters, lastPos);
     while (string::npos != pos || string::npos != lastPos)
     {
         if (pasarAminuscSinAcentos)
-        {
             token = getMinusSinAcentos(str.substr(lastPos, pos - lastPos));
-        }
         else
             token = str.substr(lastPos, pos - lastPos);
 
-        //cout << token << endl;
         tokens.push_back(token);
         lastPos = str.find_first_not_of(delimiters, pos);
         pos = str.find_first_of(delimiters, lastPos);
     }
-    //}
 }
 
 bool Tokenizador::Tokenizar(const string &i, const string &f) const
@@ -135,6 +130,9 @@ bool Tokenizador::Tokenizar(const string &i, const string &f) const
     string cadena;
     list<string> tokens;
     file.open(i.c_str());
+    fileOut.open(f.c_str());
+    list<string>::iterator itS;
+
     if (!file)
     {
         cerr << "ERROR: No existe el archivo: " << i << "\n";
@@ -149,53 +147,25 @@ bool Tokenizador::Tokenizar(const string &i, const string &f) const
             if (cadena.length() != 0)
             {
                 Tokenizar(cadena, tokens);
+                for (itS = tokens.begin(); itS != tokens.end(); itS++)
+                {
+                    fileOut << (*itS) << "\n";
+                }
             }
         }
     }
     file.close();
-    fileOut.open(f.c_str());
-    list<string>::iterator itS;
-    for (itS = tokens.begin(); itS != tokens.end(); itS++)
-    {
-        fileOut << (*itS) << "\n";
-    }
     fileOut.close();
+
+    if (!tokens.empty())
+        tokens.clear();
+
     return true;
 }
 
 bool Tokenizador::Tokenizar(const string &i) const
 {
-    ifstream file;
-    ofstream fileOut;
-    string cadena;
-    list<string> tokens;
-    file.open(i.c_str());
-    if (!file)
-    {
-        cerr << "ERROR: No existe el archivo: " << i << "\n";
-        return false;
-    }
-    else
-    {
-        while (!file.eof())
-        {
-            cadena = "";
-            getline(file, cadena);
-            if (cadena.length() != 0)
-            {
-                Tokenizar(cadena, tokens);
-            }
-        }
-    }
-    file.close();
-    fileOut.open(i + ".tk");
-    list<string>::iterator itS;
-    for (itS = tokens.begin(); itS != tokens.end(); itS++)
-    {
-        fileOut << (*itS) << endl;
-    }
-    fileOut.close();
-    return true;
+    return Tokenizar(i, i + ".tk");
 }
 
 bool Tokenizador::TokenizarListaFicheros(const string &i) const
