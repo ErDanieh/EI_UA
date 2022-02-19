@@ -23,8 +23,14 @@ int main(void)
 
         list<string> lt1, lt2;
 
-        Tokenizador a("", true, true);
+        Tokenizador a("-#:/.", true, false);
         list<string> tokens;
 
-        a.Tokenizar("h", tokens);
+        a.Tokenizar("http:////ab/", tokens);
+        imprimirListaSTL(tokens);
+        cout << "FIN" << endl;
+
+        a.Tokenizar("http:////ab.", tokens);
+        imprimirListaSTL(tokens);
+        cout << "FIN" << endl;
 }

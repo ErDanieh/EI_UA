@@ -88,7 +88,7 @@ string Tokenizador::getMinusSinAcentos(const string &palabra) const
             if (palabra[i] >= 'A' && palabra[i] <= 'Z')
                 palabraAux += tolower(palabra[i]);
             else
-                //cout<<sizeof(palabra[i])<<endl;
+                // cout<<sizeof(palabra[i])<<endl;
                 palabraAux += palabra[i];
             break;
         }
@@ -100,26 +100,29 @@ void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
 {
     if (!tokens.empty())
         tokens.clear();
-    
-    // if (casosEspeciales)
-    // UsandoCasosEspeciales(tokens, str);
 
-    // else
-    //{
-
-    string token;
-    string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-    string::size_type pos = str.find_first_of(delimiters, lastPos);
-    while (string::npos != pos || string::npos != lastPos)
+    if (casosEspeciales)
     {
-        if (pasarAminuscSinAcentos)
-            token = getMinusSinAcentos(str.substr(lastPos, pos - lastPos));
-        else
-            token = str.substr(lastPos, pos - lastPos);
+        // cout << str << endl;
+        UsandoCasosEspeciales(tokens, str);
+    }
+    else
+    {
 
-        tokens.push_back(token);
-        lastPos = str.find_first_not_of(delimiters, pos);
-        pos = str.find_first_of(delimiters, lastPos);
+        string token;
+        string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+        string::size_type pos = str.find_first_of(delimiters, lastPos);
+        while (string::npos != pos || string::npos != lastPos)
+        {
+            if (pasarAminuscSinAcentos)
+                token = getMinusSinAcentos(str.substr(lastPos, pos - lastPos));
+            else
+                token = str.substr(lastPos, pos - lastPos);
+
+            tokens.push_back(token);
+            lastPos = str.find_first_not_of(delimiters, pos);
+            pos = str.find_first_of(delimiters, lastPos);
+        }
     }
 }
 
@@ -277,6 +280,18 @@ bool Tokenizador::EsDelimitador(const char caracter) const
         return false;
 }
 
+bool Tokenizador::delimitadorDeReales(const char c) const
+{
+
+    // Miramos si esta en los caracteres definidos en los delimitadores de los reales
+    if (delimitadoresReal.find(c) != string::npos)
+        return true;
+    else if ((unsigned char)c == 164) // Miramos si el caracter es el simbolo del ? en iso-8859-1
+        return true;
+    else
+        return false;
+}
+
 void Tokenizador::analizaURLHTTPFTP(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const
 {
     if ((pos + 5 < frase.length() && frase[pos] == 'h' && frase[pos + 1] == 't' && frase[pos + 2] == 't' && frase[pos + 3] == 'p' &&
@@ -296,13 +311,126 @@ void Tokenizador::analizaURLHTTPFTP(char &c, int &estado, const string &frase, s
 
 void Tokenizador::analizaURLyMarcaTokeniza(string::size_type &npos, const string &frase, int &estado) const
 {
-    while (true)
+    bool salbucle = true;
+    while (salbucle)
     {
         npos = frase.find_first_of(this->delimiters, npos + 1);
         if (npos > frase.length() || delimitadoresURL.find(frase[npos]) == string::npos || frase[npos] == '\0')
-            break;
+            salbucle = false;
     }
     estado = TOKENIZARnormal;
+}
+
+void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos,
+                              bool &salida, bool &delimitadorRealEspecial, bool &anadirCero) const
+{
+    switch (estado)
+    {
+    case TOK_Real:
+        npos = pos;
+        c = frase[npos];
+        // Miramos si al número real hay que añadirle un 0 porque no lo tiene en el texto
+        if ((c == '.' || c == ',') && (pos == 0 || (frase[pos - 1] != '.' && frase[pos - 1] != ',')))
+            estado = TOK_Real1;
+        else if (c >= '0' && c <= '9')
+            estado = TOK_Real2;
+        else
+            estado = TOK_Email;
+        break;
+
+    // Al ser un número decimal asi -> .9 debemos añadirle un 0 en la tokenización ->0.9
+    case TOK_Real1:
+        // Comprabamos si debemos anadir un 0 al número tokenizado
+        if (c >= '0' && c <= '9')
+        {
+            anadirCero = true;
+            estado = TOK_Real2;
+        }
+        else
+            estado = TOK_Email;
+        break;
+
+    // Analizamos las comas y puntos ya que el número es decimal
+    case TOK_Real2:
+        if (c == '.' || c == ',')
+            estado = TOK_Real3;
+        else if (EsDelimitador(c))
+            estado = TOKENIZARreal;
+        else if (delimitadorDeReales(c))
+        {
+            delimitadorRealEspecial = true;
+            estado = TOK_Real5;
+        }
+        break;
+
+    case TOK_Real3:
+        if (c >= '0' && c <= '9')
+            estado = TOK_Real2; // Volvemos a analizar los números
+        else if (EsDelimitador(c))
+        {
+            estado = TOKENIZARreal;
+            --npos;
+        }
+        else
+            estado = TOK_Email;
+        break;
+    case TOK_Real5:
+        if (EsDelimitador(c))
+        {
+            estado = TOKENIZARreal;
+            --npos;
+        }
+        else
+            estado = TOK_Email;
+    }
+}
+
+void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const
+{
+    switch (estado)
+    {
+
+    case TOK_Email:
+        npos = pos;
+        c = frase[npos];
+        if (EsDelimitador(c))
+            estado = TOK_Acronimo;
+        else
+            estado = TOK_Email1;
+        break;
+
+    case TOK_Email1:
+        if (c == '@') // Buscamos el arrboba para mandar todo el trozo a tokenizar
+            estado = TOK_Email2;
+        else if (delimitadoresEmail.find(c) != string::npos)
+        {
+        }
+        else if (EsDelimitador(c))
+            estado = TOK_Acronimo;
+        break;
+
+    case TOK_Email2:
+        if (c == '@')
+            estado = TOK_Acronimo;
+        else if (delimitadoresEmail.find(c) != string::npos)
+        {
+            estado = TOK_Email3;
+        }
+        else if (EsDelimitador(c))
+            estado = TOKENIZARnormal;
+        break;
+
+    case TOK_Email3:
+        if (c == '@')
+            estado = TOK_Acronimo;
+        else if (delimitadoresEmail.find(c) != string::npos)
+        {
+            estado = TOKENIZARnormal;
+        }
+        else if (EsDelimitador(c))
+            estado = TOKENIZARnormal;
+        break;
+    }
 }
 
 void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &frase) const
@@ -320,10 +448,14 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
     int nRightPointAcronim = 0;
     int nRightGuionGuion = 0;
 
-    if (frase.length() == 0)
+    cout << frase << endl;
+
+    if (frase.length() != 0)
     {
         while (!salir)
         {
+            cout << caracter << endl;
+            cout << casoEstamos << endl;
             // Asignamos el barra 0 cuando nos pasamos de la longitud de la cadena para salirnos
             if (npos >= frase.length())
                 caracter = '\0';
@@ -333,13 +465,87 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
             // Automata de analisis de estados de la cadena
             switch (casoEstamos)
             {
+            // Analisis y marcaje de URLs
             case TOK_URL_HTTP_FTTP:
+            {
                 analizaURLHTTPFTP(caracter, casoEstamos, frase, pos, npos, salir);
                 break;
+            }
             case TOK_URL:
+            {
                 analizaURLyMarcaTokeniza(npos, frase, casoEstamos);
                 break;
             }
+
+            // Analisis de números reales
+            case TOK_Real:
+            case TOK_Real1:
+            case TOK_Real2:
+            case TOK_Real3:
+            case TOK_Real4:
+            case TOK_Real5:
+                analizaReal(caracter, casoEstamos, frase, pos, npos, salir, delimitadorRealEspecial, anadirCero);
+                break;
+
+            // Analisis de emails
+            case TOK_Email:
+            case TOK_Email1:
+            case TOK_Email2:
+            case TOK_Email3:
+                analizaEmail(caracter, casoEstamos, frase, pos, npos, salir);
+                break;
+
+            // Analisis de acronimos
+            
+            }
+
+            // Casos de tokenizacion y adicion de informacion a tokens
+            switch (casoEstamos)
+            {
+            case TOKENIZARnormal:
+                token = frase.substr(pos, npos - pos);
+                break;
+            case TOKENIZARreal:
+                if (!anadirCero)
+                    token = frase.substr(pos, npos - pos);
+                else
+                    token = "0" + frase.substr(pos, npos - pos);
+
+                if (delimitadorRealEspecial)
+                    --npos;
+                break;
+            case TOKENIZARacronimo:
+                token = frase.substr(pos + nLeftPointAcronim, (npos - nRightPointAcronim) - (pos + nLeftPointAcronim));
+                break;
+            case TOKENIZARguion:
+                token = frase.substr(pos, (npos - nRightGuionGuion) - pos);
+                break;
+            }
+
+            // Metemos el token en la lista, pasanado a minusculas si es necesario
+            if (casoEstamos >= 0 && casoEstamos <= 3)
+            {
+                // Antes de meterlo lo pasamos a minusculas
+                if (this->pasarAminuscSinAcentos)
+                    tokens.push_back(getMinusSinAcentos(token));
+                else
+                    tokens.push_back(token);
+
+                // Reseteamos los valores
+                pos = npos + 1;
+                anadirCero = false;
+                delimitadorRealEspecial = false;
+                nLeftPointAcronim = 0;
+                nRightPointAcronim = 0;
+                nRightGuionGuion = 0;
+                casoEstamos = TOK_URL_HTTP_FTTP;
+
+                if (npos >= frase.length() || frase[npos] == '\0')
+                    salir = true;
+            }
+
+            if (npos != string::npos)
+                ++npos; // Pasamos a la siguiente letra del string
         }
     }
 }

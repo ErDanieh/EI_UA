@@ -14,8 +14,8 @@
 
 using namespace std;
 
-//Variables globales para la tokenizacion por automata de estados
-// Estatus de tokenizacion
+// Variables globales para la tokenizacion por automata de estados
+//  Estatus de tokenizacion
 const int TOKENIZARnormal = 0;
 const int TOKENIZARreal = 1;
 const int TOKENIZARacronimo = 2;
@@ -120,16 +120,24 @@ private:
     string eliminaBarraN(const string &i);
 
     /**
-     * @brief  Funcion que informa si el caracter a analizar es un 
+     * @brief  Funcion que informa si el caracter a analizar es un
      * delimitador
      * @param c caracter a analizar
      * @return es un delimitador o no
      */
     bool EsDelimitador(const char c) const;
 
-    void analizaURLHTTPFTP(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const;
-    void analizaURLyMarcaTokeniza(string::size_type &npos,const string &frase, int &estado) const;
+    bool delimitadorDeReales(const char c) const;
 
+    //Analizadores de cadena 
+    void analizaURLHTTPFTP(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const;
+
+    void analizaURLyMarcaTokeniza(string::size_type &npos, const string &frase, int &estado) const;
+
+    void analizaReal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
+                     bool &delimitadorRealEspecial, bool &anadirCero) const;
+                     
+    void analizaEmail(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const;
 
 public:
     static const string delimiters_Siempre;
