@@ -129,15 +129,18 @@ private:
 
     bool delimitadorDeReales(const char c) const;
 
-    //Analizadores de cadena 
+    // Analizadores de cadena
     void analizaURLHTTPFTP(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const;
 
     void analizaURLyMarcaTokeniza(string::size_type &npos, const string &frase, int &estado) const;
 
     void analizaReal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
                      bool &delimitadorRealEspecial, bool &anadirCero) const;
-                     
+
     void analizaEmail(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const;
+
+    void analizaAcronimo(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
+                         int numPuntoIzquierda, int numPuntosDerecha) const;
 
 public:
     static const string delimiters_Siempre;

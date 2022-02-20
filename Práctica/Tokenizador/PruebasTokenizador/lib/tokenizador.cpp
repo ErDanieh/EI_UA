@@ -433,19 +433,108 @@ void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string
     }
 }
 
+void Tokenizador::analizaAcronimo(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
+                                  int numPuntoIzquierda, int numPuntosDerecha) const
+{
+    switch (estado)
+    {
+    case TOK_Acronimo:
+        npos = pos;
+        c = frase[npos];
+        if (c == '.')
+        {
+            ++numPuntoIzquierda;
+            estado = TOK_Acronimo1;
+        }
+        else if (EsDelimitador(c))
+            estado = TOK_Guion;
+        else
+            estado = TOK_Acronimo2;
+        break;
+    case TOK_Acronimo1:
+        if (EsDelimitador(c) || c == '.')
+            estado = TOK_Guion;
+        else
+            estado = TOK_Acronimo2;
+        break;
+
+    case TOK_Acronimo2:
+        if (c == '.')
+        {
+            ++numPuntosDerecha;
+            estado = TOK_Acronimo6;
+        }
+        else if (EsDelimitador(c))
+            estado = TOK_Guion;
+        break;
+
+    case TOK_Acronimo3:
+        if (c == '.')
+        {
+            ++numPuntosDerecha;
+            estado = TOK_Acronimo4;
+        }
+        else if (EsDelimitador(c) == false)
+        {
+            --numPuntosDerecha;
+            estado = TOK_Acronimo5;
+        }
+        else
+            estado = TOKENIZARacronimo;
+        break;
+
+    case TOK_Acronimo4:
+        if (c == '.')
+        {
+            ++numPuntosDerecha;
+        }
+        else if (EsDelimitador(c))
+            estado = TOKENIZARacronimo;
+        else
+            estado = TOK_Guion;
+        break;
+
+    case TOK_Acronimo5:
+        if (c == '.')
+        {
+            ++numPuntosDerecha;
+            estado = TOK_Acronimo3;
+        }
+        else if (EsDelimitador(c))
+            estado = TOKENIZARacronimo;
+        break;
+
+    case TOK_Acronimo6:
+        if (c == '.' || EsDelimitador(c))
+            estado = TOK_Guion;
+        else
+        {
+            --numPuntosDerecha;
+            estado = TOK_Acronimo5;
+        }
+        break;
+    }
+}
+
 void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &frase) const
 {
+    //Inicializamos el estado a las URL
     int casoEstamos = TOK_URL_HTTP_FTTP;
     string delimitadores = delimiters + " ";
+    //Caracter que vamos a analizar
     char caracter;
     string::size_type pos = 0;
     string::size_type npos = 0;
+    //Token generado despues de la analización con la resta de las posiciones
     string token;
+    //Parametro de salida del bucle cuando se acaba la frase
     bool salir = false;
+    //Adiccion de informacion en los numeros reales decimales
     bool anadirCero = false;
     bool delimitadorRealEspecial = false;
-    int nLeftPointAcronim = 0;
-    int nRightPointAcronim = 0;
+    //Cantidad de puntos que nos saltamos o anadimos en el token 
+    int numPuntosIzquierda = 0;
+    int numPuntosDerecha = 0;
     int nRightGuionGuion = 0;
 
     cout << frase << endl;
@@ -454,8 +543,8 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
     {
         while (!salir)
         {
-            cout << caracter << endl;
-            cout << casoEstamos << endl;
+            cout << "Estado: " << casoEstamos << endl;
+            cout << "caracter: " << caracter << endl;
             // Asignamos el barra 0 cuando nos pasamos de la longitud de la cadena para salirnos
             if (npos >= frase.length())
                 caracter = '\0';
@@ -496,9 +585,18 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 break;
 
             // Analisis de acronimos
-            
-            }
+            case TOK_Acronimo:
+            case TOK_Acronimo1:
+            case TOK_Acronimo2:
+            case TOK_Acronimo3:
+            case TOK_Acronimo4:
+            case TOK_Acronimo5:
+            case TOK_Acronimo6:
+                analizaAcronimo(caracter, casoEstamos, frase, pos, npos, salir, numPuntosIzquierda, numPuntosDerecha);
+                break;
 
+            // Analisis de palabras compuestas
+            }
             // Casos de tokenizacion y adicion de informacion a tokens
             switch (casoEstamos)
             {
@@ -515,7 +613,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                     --npos;
                 break;
             case TOKENIZARacronimo:
-                token = frase.substr(pos + nLeftPointAcronim, (npos - nRightPointAcronim) - (pos + nLeftPointAcronim));
+                token = frase.substr(pos + numPuntosIzquierda, (npos - numPuntosDerecha) - (pos + numPuntosIzquierda));
                 break;
             case TOKENIZARguion:
                 token = frase.substr(pos, (npos - nRightGuionGuion) - pos);
@@ -535,8 +633,8 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 pos = npos + 1;
                 anadirCero = false;
                 delimitadorRealEspecial = false;
-                nLeftPointAcronim = 0;
-                nRightPointAcronim = 0;
+                numPuntosIzquierda = 0;
+                numPuntosDerecha = 0;
                 nRightGuionGuion = 0;
                 casoEstamos = TOK_URL_HTTP_FTTP;
 
