@@ -3,10 +3,10 @@
 const string Tokenizador::delimiters_Siempre = " \n";
 
 /**
- * TODO:Evitar salto linea en consola
- * TODO:Implementar el automata de estados
- * TODO:Dibujar diagrama de estados
- *
+ * TODO: Corregir pruebas fallan
+ * TODO: Evitar salto linea consola
+ * TODO: Dibujar bien el grafo para presentacion
+ * TODO: Mirar mmap 
  **/
 
 Tokenizador::Tokenizador()
@@ -20,15 +20,8 @@ Tokenizador::Tokenizador(const string &delimitadoresPalabra, const bool &kcasosE
 {
     this->casosEspeciales = kcasosEspeciales;
     this->pasarAminuscSinAcentos = minuscSinAcentos;
-    if (this->casosEspeciales)
-    {
-        string insertar = delimiters_Siempre + delimitadoresPalabra;
-        EliminarRepetidos(this->delimiters = insertar);
-    }
-    else
-    {
-        EliminarRepetidos(this->delimiters = delimitadoresPalabra);
-    }
+    this->delimiters = delimitadoresPalabra;
+    EliminarRepetidos(this->delimiters);
 }
 
 Tokenizador::Tokenizador(const Tokenizador &token)
@@ -208,16 +201,7 @@ void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
 {
     // Solo si los casos especiales estÃ¡n activados se aÃ±adirÃ¡n los delimitadores que siempre se activan
     // el salto de linea y el espacio
-    if (this->casosEspeciales)
-    {
-        string insertados = delimiters_Siempre + nuevoDelimiters;
-        EliminarRepetidos(insertados);
-        this->delimiters = insertados;
-    }
-    else
-    {
-        EliminarRepetidos(this->delimiters = nuevoDelimiters);
-    }
+    EliminarRepetidos(this->delimiters = nuevoDelimiters);
 }
 
 void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
@@ -271,13 +255,26 @@ ostream &operator<<(ostream &os, const Tokenizador &tokenizador)
 bool Tokenizador::EsDelimitador(const char caracter) const
 {
     if (caracter == '\0')
+    {
+        //cout << "entro 1 "<< endl;
         return true;
+    }
+
     else if (caracter == ' ')
+    {
+        //cout << "entro 2 "<<endl;
         return true;
+    }
     else if (this->delimiters.find(caracter) != string::npos) // Mira en los delimitadores marcados
+    {
+        //cout << "entro 3 "<< endl;
         return true;
+    }
     else
+    {
+        //cout << "entro 4 "<< endl;
         return false;
+    }
 }
 
 bool Tokenizador::delimitadorDeReales(const char c) const
@@ -434,7 +431,7 @@ void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string
 }
 
 void Tokenizador::analizaAcronimo(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
-                                  int numPuntoIzquierda, int numPuntosDerecha) const
+                                  int &numPuntoIzquierda, int &numPuntosDerecha) const
 {
     switch (estado)
     {
@@ -516,41 +513,147 @@ void Tokenizador::analizaAcronimo(char &c, int &estado, const string &frase, str
     }
 }
 
+void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
+                                    int &numGuionesDerecha) const
+{
+    switch (estado)
+    {
+    /**Si encontramos un delimitador saltamos al estado de Tokenizar Normal
+     * si encontramos cualquier otra cosa pasamos a analizar la palabra compuesta
+     */
+    case TOK_Guion:
+        npos = pos;
+        c = frase[npos];
+        if (EsDelimitador(c))
+            estado = TOK_Normal;
+        else
+            estado = TOK_Guion1;
+        break;
+    /**Si lo primero que encontramos es un guion pasamos al siguiente estado de los guiones
+     * si encontramos un delimitador pasamos al estado de Tokenizar Normal
+     */
+    case TOK_Guion1:
+        if (c == '-')
+            estado = TOK_Guion2;
+        else if (EsDelimitador(c))
+            estado = TOK_Normal;
+        break;
+    /**Si volvemos a encontrar un guion o encontramos un delimitdor pasamos a
+     * Tokenizar normal , por el contrario si encontramos cualquier otra cosa
+     * seguimos analizando la palabra compuesta
+     */
+    case TOK_Guion2:
+        if (c == '-' || EsDelimitador(c))
+            estado = TOK_Normal;
+        else
+            estado = TOK_Guion3;
+        break;
+        /**Si encontramos un guion sumamos 1 a nuestro contador y seguimos analizando
+         * la palabra compuesta, si es un delimitador pasamos al estado de Tokenizar con guiones
+         * como una palabra compuesta ya que tiene al menos un guion
+         */
+    case TOK_Guion3:
+        if (c == '-')
+        {
+            ++numGuionesDerecha;
+            estado = TOK_Guion4;
+        }
+        else if (EsDelimitador(c))
+            estado = TOKENIZARguion;
+        break;
+    /**Si encontramos un guion sumamos 1 a nuestro contador y seguimos analizando
+     * si por el contrario encontramos un delimitador pasamos ya a tokenizar guion
+     * en cualquier otro caso pasamos al estado 3
+     */
+    case TOK_Guion4:
+        if (c == '-')
+        {
+            ++numGuionesDerecha;
+            estado = TOK_Guion5;
+        }
+        else if (EsDelimitador(c))
+            estado = TOKENIZARguion;
+        else
+        {
+            --numGuionesDerecha;
+            estado = TOK_Guion3;
+        }
+        break;
+        /**Si encontramos un guion sumamos 1 a nuestro contador y seguimos analizando
+         * si por el contrario encontramos un delimitador pasamos ya a tokenizar guion
+         * en cualquier otro caso pasamos a tokenizar normal
+         */
+    case TOK_Guion5:
+        if (c == '-')
+        {
+            ++numGuionesDerecha;
+        }
+        else if (EsDelimitador(c))
+            estado = TOKENIZARguion;
+        else
+        {
+            estado = TOK_Normal;
+        }
+    }
+}
+
+void Tokenizador::estadoNormal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
+                               int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha) const
+{
+    string delim = this->delimiters + " ";
+    
+    if (!EsDelimitador(frase[pos]))
+    {  
+        //cout<<frase[pos]<<endl;
+        //cout << delim << endl;
+        npos = frase.find_first_of(delim, pos);
+        //cout << npos << endl;
+        estado = TOKENIZARnormal;
+    }
+    else
+    {
+        numPuntoIzquierda = 0;
+        estado = TOK_URL_HTTP_FTTP;
+        npos = pos;
+        ++pos;
+    }
+}
+
 void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &frase) const
 {
-    //Inicializamos el estado a las URL
+    // Inicializamos el estado a las URL
     int casoEstamos = TOK_URL_HTTP_FTTP;
     string delimitadores = delimiters + " ";
-    //Caracter que vamos a analizar
+    // Caracter que vamos a analizar
     char caracter;
     string::size_type pos = 0;
     string::size_type npos = 0;
-    //Token generado despues de la analización con la resta de las posiciones
+    // Token generado despues de la analización con la resta de las posiciones
     string token;
-    //Parametro de salida del bucle cuando se acaba la frase
+    // Parametro de salida del bucle cuando se acaba la frase
     bool salir = false;
-    //Adiccion de informacion en los numeros reales decimales
+    // Adiccion de informacion en los numeros reales decimales
     bool anadirCero = false;
     bool delimitadorRealEspecial = false;
-    //Cantidad de puntos que nos saltamos o anadimos en el token 
+    // Cantidad de puntos que nos saltamos o anadimos en el token
     int numPuntosIzquierda = 0;
     int numPuntosDerecha = 0;
-    int nRightGuionGuion = 0;
+    int numGuionesDerecha = 0;
 
-    cout << frase << endl;
+    // cout << frase << endl;
 
     if (frase.length() != 0)
     {
         while (!salir)
         {
-            cout << "Estado: " << casoEstamos << endl;
-            cout << "caracter: " << caracter << endl;
             // Asignamos el barra 0 cuando nos pasamos de la longitud de la cadena para salirnos
             if (npos >= frase.length())
                 caracter = '\0';
             else
                 caracter = frase[npos]; // Asignamos el caracter que vamos a analizar
-
+            //cout << "caracter: " << caracter << endl;
+            //cout << "Estado: " << casoEstamos << endl;
+            //cout << endl;
             // Automata de analisis de estados de la cadena
             switch (casoEstamos)
             {
@@ -596,6 +699,19 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 break;
 
             // Analisis de palabras compuestas
+            case TOK_Guion:
+            case TOK_Guion1:
+            case TOK_Guion2:
+            case TOK_Guion3:
+            case TOK_Guion4:
+            case TOK_Guion5:
+                analizaCompuestas(caracter, casoEstamos, frase, pos, npos, salir, numGuionesDerecha);
+                break;
+
+            // Si el caracter por el que vamos no es un delimi
+            case TOK_Normal:
+                estadoNormal(caracter, casoEstamos, frase, pos, npos, salir, numPuntosIzquierda, numGuionesDerecha, numGuionesDerecha);
+                break;
             }
             // Casos de tokenizacion y adicion de informacion a tokens
             switch (casoEstamos)
@@ -616,7 +732,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 token = frase.substr(pos + numPuntosIzquierda, (npos - numPuntosDerecha) - (pos + numPuntosIzquierda));
                 break;
             case TOKENIZARguion:
-                token = frase.substr(pos, (npos - nRightGuionGuion) - pos);
+                token = frase.substr(pos, (npos - numGuionesDerecha) - pos);
                 break;
             }
 
@@ -635,13 +751,12 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 delimitadorRealEspecial = false;
                 numPuntosIzquierda = 0;
                 numPuntosDerecha = 0;
-                nRightGuionGuion = 0;
+                numGuionesDerecha = 0;
                 casoEstamos = TOK_URL_HTTP_FTTP;
 
                 if (npos >= frase.length() || frase[npos] == '\0')
                     salir = true;
             }
-
             if (npos != string::npos)
                 ++npos; // Pasamos a la siguiente letra del string
         }

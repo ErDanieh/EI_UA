@@ -140,7 +140,13 @@ private:
     void analizaEmail(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const;
 
     void analizaAcronimo(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
-                         int numPuntoIzquierda, int numPuntosDerecha) const;
+                         int &numPuntoIzquierda, int &numPuntosDerecha) const;
+
+    void analizaCompuestas(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
+                           int &numGuionesDerecha) const;
+
+    void estadoNormal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
+                       int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha) const;
 
 public:
     static const string delimiters_Siempre;
