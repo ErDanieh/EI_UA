@@ -63,7 +63,7 @@ const int TOK_Normal = 29;
 // Delimitadores Frecuentes que aparecen en URLs
 const string delimitadoresURL = "_:/.?&-=#@";
 // Delimitadores Frecuentes que aparecen en numeros reales
-const string delimitadoresReal = "%$ªº";
+const string delimitadoresReal = "%$ï¿½ï¿½";
 // Delimitadores Frecuentes que aparecen en emails
 const string delimitadoresEmail = "-_.";
 
@@ -221,7 +221,7 @@ public:
      * @return true
      * @return false
      */
-    bool Tokenizar(const string &i) const;
+    bool Tokenizar(const string &i) const  { return Tokenizar(i, i + ".tk");}
 
     /**
      * @brief

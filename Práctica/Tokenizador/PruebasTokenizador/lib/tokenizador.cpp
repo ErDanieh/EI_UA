@@ -3,6 +3,7 @@
 const string Tokenizador::delimiters_Siempre = " \n";
 
 /**
+ * TODO:Poner \n y espacio de delimitadores
  * TODO: Corregir pruebas fallan
  * TODO: Evitar salto linea consola
  * TODO: Dibujar bien el grafo para presentacion
@@ -159,10 +160,12 @@ bool Tokenizador::Tokenizar(const string &i, const string &f) const
     return true;
 }
 
+#if 0
 bool Tokenizador::Tokenizar(const string &i) const
 {
     return Tokenizar(i, i + ".tk");
 }
+#endif
 
 bool Tokenizador::TokenizarListaFicheros(const string &i) const
 {
@@ -259,7 +262,9 @@ bool Tokenizador::EsDelimitador(const char caracter) const
         //cout << "entro 1 "<< endl;
         return true;
     }
-
+    //else if(caracter == '\n'){
+        //return true;
+    //}
     else if (caracter == ' ')
     {
         //cout << "entro 2 "<<endl;
@@ -283,7 +288,7 @@ bool Tokenizador::delimitadorDeReales(const char c) const
     // Miramos si esta en los caracteres definidos en los delimitadores de los reales
     if (delimitadoresReal.find(c) != string::npos)
         return true;
-    else if ((unsigned char)c == 164) // Miramos si el caracter es el simbolo del ? en iso-8859-1
+    else if ((unsigned char)c == 164) // Miramos si el caracter es el simbolo del euro en iso-8859-1
         return true;
     else
         return false;
@@ -410,9 +415,7 @@ void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string
         if (c == '@')
             estado = TOK_Acronimo;
         else if (delimitadoresEmail.find(c) != string::npos)
-        {
-            estado = TOK_Email3;
-        }
+        {}
         else if (EsDelimitador(c))
             estado = TOKENIZARnormal;
         break;
@@ -640,7 +643,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
     int numPuntosDerecha = 0;
     int numGuionesDerecha = 0;
 
-    // cout << frase << endl;
+    //cout << frase << endl;
 
     if (frase.length() != 0)
     {
