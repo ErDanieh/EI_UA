@@ -115,7 +115,7 @@ private:
      *
      * @param cadena Cadena para transformar
      */
-    string getMinusSinAcentos(const string &palabra) const;
+    string normalizaAcentosMinusculas(const string &palabra) const;
 
     string eliminaBarraN(const string &i);
 
