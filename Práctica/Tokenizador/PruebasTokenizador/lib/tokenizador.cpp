@@ -87,7 +87,7 @@ string Tokenizador::normalizaAcentosMinusculas(const string &palabra) const
         case 218: // U mayuscula con acento
             palabraAux += 'u';
             break;
-        case 209: // transforma Ñ mayuscula en minuscula
+        case 209: // transforma ï¿½ mayuscula en minuscula
             palabraAux += 'ñ';
             break;
         default: // El resto de letras si son mayusculas son transformadas a minusculas
@@ -328,7 +328,9 @@ void Tokenizador::analizaURLyMarcaTokeniza(string::size_type &npos, const string
     bool salbucle = true;
     while (salbucle)
     {
+        // Vamos saltandonos los delimitadores de la URL para poder meterlos todos en una sola palabra
         npos = frase.find_first_of(this->delimiters, npos + 1);
+        // Salimos del bucle cuando encontremos un delimitador de URL o nos quedemos sin palabra
         if (npos > frase.length() || delimitadoresURL.find(frase[npos]) == string::npos || frase[npos] == '\0')
             salbucle = false;
     }
@@ -343,7 +345,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
     case TOK_Real:
         npos = pos;
         c = frase[npos];
-        // Miramos si al número real hay que añadirle un 0 porque no lo tiene en el texto
+        // Miramos si al nï¿½mero real hay que aï¿½adirle un 0 porque no lo tiene en el texto
         if ((c == '.' || c == ',') && (pos == 0 || (frase[pos - 1] != '.' && frase[pos - 1] != ',')))
             estado = TOK_Real1;
         else if (c >= '0' && c <= '9')
@@ -352,9 +354,9 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
             estado = TOK_Email;
         break;
 
-    // Al ser un número decimal asi -> .9 debemos añadirle un 0 en la tokenización ->0.9
+    // Al ser un numero decimal asi -> .9 debemos anadirle un 0 en la tokenizacion ->0.9
     case TOK_Real1:
-        // Comprabamos si debemos anadir un 0 al número tokenizado
+        // Comprabamos si debemos anadir un 0 al numero tokenizado
         if (c >= '0' && c <= '9')
         {
             anadirCero = true;
@@ -364,7 +366,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
             estado = TOK_Email;
         break;
 
-    // Analizamos las comas y puntos ya que el número es decimal
+    // Analizamos las comas y puntos ya que el numero es decimal
     case TOK_Real2:
         if (c == '.' || c == ',')
             estado = TOK_Real3;
@@ -381,7 +383,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
 
     case TOK_Real3:
         if (c >= '0' && c <= '9')
-            estado = TOK_Real2; // Volvemos a analizar los números
+            estado = TOK_Real2; // Volvemos a analizar los numeros
         else if (EsDelimitador(c))
         {
             estado = TOKENIZARreal;
@@ -435,6 +437,7 @@ void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string
             estado = TOKENIZARnormal;
         break;
 
+#if 0
     case TOK_Email3:
         if (c == '@')
             estado = TOK_Acronimo;
@@ -445,6 +448,7 @@ void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string
         else if (EsDelimitador(c))
             estado = TOKENIZARnormal;
         break;
+#endif
     }
 }
 
@@ -646,7 +650,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
     char caracter;
     string::size_type pos = 0;
     string::size_type npos = 0;
-    // Token generado despues de la analización con la resta de las posiciones
+    // Token generado despues de la analizaciï¿½n con la resta de las posiciones
     string token;
     // Parametro de salida del bucle cuando se acaba la frase
     bool salir = false;
@@ -686,7 +690,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 analizaURLyMarcaTokeniza(npos, frase, casoEstamos);
                 break;
 
-            // Analisis de números reales
+            // Analisis de nï¿½meros reales
             case TOK_Real:
             case TOK_Real1:
             case TOK_Real2:
