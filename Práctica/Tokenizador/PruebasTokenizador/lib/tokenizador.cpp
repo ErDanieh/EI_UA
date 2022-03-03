@@ -89,7 +89,7 @@ string Tokenizador::normalizaAcentosMinusculas(const string &palabra) const
             palabraAux += (char)117;
             break;
         case 209: // transforma ? mayuscula en minuscula
-            palabraAux += 'ñ';
+            palabraAux += (char)241;
             break;
         default: // El resto de letras si son mayusculas son transformadas a minusculas
             if (palabra[i] >= (char)65 && palabra[i] <= (char)90)
@@ -270,29 +270,11 @@ ostream &operator<<(ostream &os, const Tokenizador &tokenizador)
 
 bool Tokenizador::EsDelimitador(const char caracter) const
 {
-    if (caracter == '\0')
+    if (caracter == '\0' || caracter == ' ' || this->delimiters.find(caracter) != string::npos)
     {
-        // cout << "entro 1 "<< endl;
         return true;
     }
-    // else if(caracter == '\n'){
-    // return true;
-    //}
-    else if (caracter == ' ')
-    {
-        // cout << "entro 2 "<<endl;
-        return true;
-    }
-    else if (this->delimiters.find(caracter) != string::npos) // Mira en los delimitadores marcados
-    {
-        // cout << "entro 3 "<< endl;
-        return true;
-    }
-    else
-    {
-        // cout << "entro 4 "<< endl;
-        return false;
-    }
+    return false;
 }
 
 bool Tokenizador::delimitadorDeReales(const char c) const
@@ -445,18 +427,6 @@ void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string
             estado = TOKENIZARnormal;
         break;
 
-#if 0
-    case TOK_Email3:
-        if (c == '@')
-            estado = TOK_Acronimo;
-        else if (delimitadoresEmail.find(c) != string::npos)
-        {
-            estado = TOKENIZARnormal;
-        }
-        else if (EsDelimitador(c))
-            estado = TOKENIZARnormal;
-        break;
-#endif
     }
 }
 
