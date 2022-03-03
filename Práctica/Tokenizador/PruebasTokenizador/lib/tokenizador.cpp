@@ -4,6 +4,7 @@ const string Tokenizador::delimiters_Siempre = " \n";
 
 /**
  * TODO:numero03.cpp
+ * TODO:Si encuentro otro . o , cambia el pos al siguiente
  * TODO:Poner \n y espacio de delimitadores
  * TODO: Corregir pruebas fallan
  * TODO: Evitar salto linea consola
@@ -13,7 +14,7 @@ const string Tokenizador::delimiters_Siempre = " \n";
 
 Tokenizador::Tokenizador()
 {
-    this->delimiters = ",;:.-/+*\\ '\"{}[]()<>Â¡!Â¿?&#=\t\n\r@";
+    this->delimiters = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
     this->casosEspeciales = true;
     this->pasarAminuscSinAcentos = false;
 }
@@ -69,29 +70,29 @@ string Tokenizador::normalizaAcentosMinusculas(const string &palabra) const
         {
         case 225: // a minuscula con acento
         case 193: // A mayuscula con acento
-            palabraAux += 'a';
+            palabraAux += (char) 97;
             break;
         case 233: // e minuscula con acento
         case 201: // E mayuscula con acento
-            palabraAux += 'e';
+            palabraAux += (char) 101;
             break;
         case 237: // i minuscula con acento
         case 205: // I mayuscula con acento
-            palabraAux += 'i';
+            palabraAux += (char)105;
             break;
         case 243: // o minuscula con acento
         case 211: // O mayuscula con acento
-            palabraAux += 'o';
+            palabraAux += (char)111;
             break;
         case 250: // u minuscula con acento
         case 218: // U mayuscula con acento
-            palabraAux += 'u';
+            palabraAux += (char)117;
             break;
-        case 209: // transforma ï¿½ mayuscula en minuscula
+        case 209: // transforma ? mayuscula en minuscula
             palabraAux += 'ñ';
             break;
         default: // El resto de letras si son mayusculas son transformadas a minusculas
-            if (palabra[i] >= 'A' && palabra[i] <= 'Z')
+            if (palabra[i] >= (char)65 && palabra[i] <= (char)90)
                 palabraAux += tolower(palabra[i]);
             else
                 // cout<<sizeof(palabra[i])<<endl;
@@ -214,7 +215,7 @@ bool Tokenizador::TokenizarDirectorio(const string &i) const
 
 void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
 {
-    // Solo si los casos especiales estÃ¡n activados se aÃ±adirÃ¡n los delimitadores que siempre se activan
+    // Solo si los casos especiales están activados se añadirán los delimitadores que siempre se activan
     // el salto de linea y el espacio
     EliminarRepetidos(this->delimiters = nuevoDelimiters);
 }
@@ -345,7 +346,14 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
     case TOK_Real:
         npos = pos;
         c = frase[npos];
-        // Miramos si al nï¿½mero real hay que aï¿½adirle un 0 porque no lo tiene en el texto
+        #if 0
+        cout<<frase<<endl;
+        cout << frase[pos]<<endl;
+        cout << frase[pos-1]<<endl;
+        cout << c << endl;
+        cout<<"--------"<<endl;
+        #endif
+        // Miramos si al n?mero real hay que a?adirle un 0 porque no lo tiene en el texto
         if ((c == '.' || c == ',') && (pos == 0 || (frase[pos - 1] != '.' && frase[pos - 1] != ',')))
             estado = TOK_Real1;
         else if (c >= '0' && c <= '9')
@@ -609,6 +617,7 @@ void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, s
         if (c == '-')
         {
             ++numGuionesDerecha;
+            //estado = TOK_Guion4
         }
         else if (EsDelimitador(c))
             estado = TOKENIZARguion;
@@ -650,7 +659,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
     char caracter;
     string::size_type pos = 0;
     string::size_type npos = 0;
-    // Token generado despues de la analizaciï¿½n con la resta de las posiciones
+    // Token generado despues de la analizaci?n con la resta de las posiciones
     string token;
     // Parametro de salida del bucle cuando se acaba la frase
     bool salir = false;
@@ -690,7 +699,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 analizaURLyMarcaTokeniza(npos, frase, casoEstamos);
                 break;
 
-            // Analisis de nï¿½meros reales
+            // Analisis de n?meros reales
             case TOK_Real:
             case TOK_Real1:
             case TOK_Real2:
