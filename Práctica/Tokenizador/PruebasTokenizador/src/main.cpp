@@ -2,10 +2,11 @@
 #include <string>
 #include <list> 
 #include "tokenizador.h"
+#include <ctime> 
 
 using namespace std;
 
-///////// Comprobación de que vacíe la lista resultado
+///////// Comprobaci n de que vac e la lista resultado
 
 void imprimirListaSTL(const list<string>& cadena)
 {
@@ -23,18 +24,16 @@ main(void)
 	bool kCasosEspeciales = true, kpasarAminusculas = false;
 
 	list<string> lt1, lt2;
-
+unsigned t0, t1;
+ 
+t0=clock();
 Tokenizador a("", true, false); 
 list<string> tokens; 
 
-a.Tokenizar("http:", tokens);
-	imprimirListaSTL(tokens);
 
-a.Tokenizar("http:////ab/", tokens);
-	imprimirListaSTL(tokens);
+a.TokenizarListaFicheros("listaFicheros.txt");
+t1 = clock();
 
-a.Tokenizar("http:////ab.", tokens);
-	imprimirListaSTL(tokens);
-
-
+double time = (double(t1-t0)/CLOCKS_PER_SEC);
+cout << "Execution Time: " << time << endl;
 }
