@@ -397,7 +397,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
 void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string::size_type &pos,
                                string::size_type &npos, bool &salida, int &numArrobas) const
 {
-    //Lee una string hasta el primer espacio o fin de cadena
+    // Lee una string hasta el primer espacio o fin de cadena
     switch (estado)
     {
 
@@ -622,7 +622,7 @@ void Tokenizador::estadoNormal(char &c, int &estado, const string &frase, string
         estado = TOK_URL_HTTP_FTTP;
         npos = pos;
         ++pos;
-        //numArrobas = 0;
+        // numArrobas = 0;
     }
 }
 
@@ -763,11 +763,21 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 break;
             case TOKENIZARguion:
 #if 0
-                cout<< "TOKENIZARguion" << endl;
-                cout << frase.substr(pos, npos - pos) << endl;
+                cout << "TOKENIZARguion" << endl;
+                cout << frase.substr(pos, (npos)-pos) << endl;
                 cout << "-----" << endl;
+                cout << numGuionesDerecha << endl;
+
 #endif
-                token = frase.substr(pos, (npos - numGuionesDerecha) - pos);
+                if (numGuionesDerecha == 0 || this->delimiters.find("-") != string::npos)
+                {
+                    //cout << "Entra en el if" << endl;
+                    token = frase.substr(pos, (npos)-pos);
+                    if (numGuionesDerecha != 0)
+                        token = frase.substr(pos, (npos- numGuionesDerecha)-pos);
+                }
+                else
+                    token = frase.substr(pos, (npos + numGuionesDerecha) - pos);
                 break;
             }
 
