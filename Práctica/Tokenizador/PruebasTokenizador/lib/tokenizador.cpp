@@ -3,6 +3,7 @@
 const string Tokenizador::delimiters_Siempre = " \n";
 
 /**
+ * TODO:añadir contador de @ en el segundo estado de los emails
  * TODO:numero03.cpp
  * TODO:Si encuentro otro . o , cambia el pos al siguiente
  * TODO:Poner \n y espacio de delimitadores
