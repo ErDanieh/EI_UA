@@ -3,7 +3,7 @@
 const string Tokenizador::delimiters_Siempre = " \n";
 
 /**
- * TODO:añadir contador de @ en el segundo estado de los emails
+
  * TODO:numero03.cpp
  * TODO:Si encuentro otro . o , cambia el pos al siguiente
  * TODO:Poner \n y espacio de delimitadores
@@ -337,7 +337,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
         cout<<"--------"<<endl;
 #endif
         // Miramos si al n?mero real hay que a?adirle un 0 porque no lo tiene en el texto
-        if ((c == '.' || c == ',') && (pos == 0 || (frase[pos - 1] != '.' && frase[pos - 1] != ',')))
+        if ((c == '.' || c == ',') )
             estado = TOK_Real1;
         else if (c >= '0' && c <= '9')
             estado = TOK_Real2;
