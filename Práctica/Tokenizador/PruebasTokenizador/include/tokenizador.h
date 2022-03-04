@@ -137,7 +137,7 @@ private:
     void analizaReal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
                      bool &delimitadorRealEspecial, bool &anadirCero) const;
 
-    void analizaEmail(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const;
+    void analizaEmail(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida, int &numArrobas) const;
 
     void analizaAcronimo(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
                          int &numPuntoIzquierda, int &numPuntosDerecha) const;
@@ -146,7 +146,7 @@ private:
                            int &numGuionesDerecha) const;
 
     void estadoNormal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
-                       int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha) const;
+                       int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha,int &numArrobas) const;
 
 public:
     static const string delimiters_Siempre;
