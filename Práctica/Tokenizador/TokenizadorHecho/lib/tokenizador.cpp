@@ -3,8 +3,6 @@
 const string Tokenizador::delimiters_Siempre = " \n";
 
 /**
-
- * TODO:numero03.cpp
  * TODO:Si encuentro otro . o , cambia el pos al siguiente
  * TODO:Poner \n y espacio de delimitadores
  * TODO: Corregir pruebas fallan
@@ -269,7 +267,7 @@ ostream &operator<<(ostream &os, const Tokenizador &tokenizador)
     return os;
 }
 
-bool Tokenizador::EsDelimitador(const char caracter) const
+bool Tokenizador::EsDelimitador(const char caracter, int &casoAnterior) const
 {
     if (caracter == '\0' || caracter == ' ' || this->delimiters.find(caracter) != string::npos)
     {
@@ -290,25 +288,27 @@ bool Tokenizador::delimitadorDeReales(const char c) const
         return false;
 }
 
-void Tokenizador::analizaURLHTTPFTP(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida) const
+void Tokenizador::analizaURLHTTPFTP(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida, int &casoAnterior) const
 {
-    if ((pos + 5 < frase.length() && frase[pos] == 'h' && frase[pos + 1] == 't' && frase[pos + 2] == 't' && frase[pos + 3] == 'p' &&
+    casoAnterior = estado;
+    if ((pos + 5 < frase.length() && (frase[pos] == 'h' ||frase[pos] == 'H') && frase[pos + 1] == 't' && frase[pos + 2] == 't' && frase[pos + 3] == 'p' &&
          (frase[pos + 4] == ':' || (pos + 6 < frase.length() && frase[pos + 4] == 's' && frase[pos + 5] == ':'))) ||
-        (pos + 4 < frase.length() && frase[pos] == 'f' && frase[pos + 1] == 't' && frase[pos + 2] == 'p' && frase[pos + 3] == ':'))
+        (pos + 4 < frase.length() && (frase[pos] == 'f'|| frase[pos] == 'F') && frase[pos + 1] == 't' && frase[pos + 2] == 'p' && frase[pos + 3] == ':'))
     {
         estado = TOK_URL;
         npos = frase.find_first_of(':', pos);
     }
     else if (c == '\0')
         salida = true;
-    else if (c != '.' && c != ',' && EsDelimitador(c))
+    else if (c != '.' && c != ',' && EsDelimitador(c,casoAnterior))
         ++pos;
     else
         estado = TOK_Real;
 }
 
-void Tokenizador::analizaURLyMarcaTokeniza(string::size_type &npos, const string &frase, int &estado) const
+void Tokenizador::analizaURLyMarcaTokeniza(string::size_type &npos, const string &frase, int &estado,int &casoAnterior) const
 {
+    casoAnterior = estado;
     bool salbucle = true;
     while (salbucle)
     {
@@ -322,8 +322,9 @@ void Tokenizador::analizaURLyMarcaTokeniza(string::size_type &npos, const string
 }
 
 void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos,
-                              bool &salida, bool &delimitadorRealEspecial, bool &anadirCero) const
+                              bool &salida, bool &delimitadorRealEspecial, bool &anadirCero,int &casoAnterior) const
 {
+    casoAnterior = estado;
     switch (estado)
     {
     case TOK_Real:
@@ -338,7 +339,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
 #endif
         // Miramos si al n?mero real hay que a?adirle un 0 porque no lo tiene en el texto
         if ((c == '.' || c == ',') )
-            estado = TOK_Real1;
+            estado = TOK_AnadeCero;
         else if (c >= '0' && c <= '9')
             estado = TOK_Real2;
         else
@@ -346,7 +347,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
         break;
 
     // Al ser un numero decimal asi -> .9 debemos anadirle un 0 en la tokenizacion ->0.9
-    case TOK_Real1:
+    case TOK_AnadeCero:
         // Comprabamos si debemos anadir un 0 al numero tokenizado
         if (c >= '0' && c <= '9')
         {
@@ -361,7 +362,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
     case TOK_Real2:
         if (c == '.' || c == ',')
             estado = TOK_Real3;
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOKENIZARreal;
         else if (delimitadorDeReales(c))
         {
@@ -375,7 +376,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
     case TOK_Real3:
         if (c >= '0' && c <= '9')
             estado = TOK_Real2; // Volvemos a analizar los numeros
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
         {
             estado = TOKENIZARreal;
             --npos;
@@ -384,7 +385,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
             estado = TOK_Email;
         break;
     case TOK_Real4:
-        if (EsDelimitador(c))
+        if (EsDelimitador(c,casoAnterior))
         {
             estado = TOKENIZARreal;
             --npos;
@@ -395,8 +396,9 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
 }
 
 void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string::size_type &pos,
-                               string::size_type &npos, bool &salida, int &numArrobas) const
+                               string::size_type &npos, bool &salida, int &numArrobas,int &casoAnterior) const
 {
+    casoAnterior = estado;
     // Lee una string hasta el primer espacio o fin de cadena
     switch (estado)
     {
@@ -404,42 +406,49 @@ void Tokenizador::analizaEmail(char &c, int &estado, const string &frase, string
     case TOK_Email:
         npos = pos;
         c = frase[npos];
-        if (EsDelimitador(c))
+        if (EsDelimitador(c,casoAnterior))
             estado = TOK_Acronimo;
         else
-            estado = TOK_Email1;
+            estado = TOK_EmailArroba;
         break;
 
-    case TOK_Email1:
+    case TOK_EmailArroba:
         if (c == '@') // Buscamos el arrboba para mandar todo el trozo a tokenizar
         {
-            estado = TOK_Email2;
+            estado = TOK_EmailSaleOTokeniza;
             ++numArrobas;
         }
         else if (delimitadoresEmail.find(c) != string::npos)
         {
+            //Nos comemos los delimitadores de los emails
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOK_Acronimo;
         break;
 
-    case TOK_Email2:
+    case TOK_EmailSaleOTokeniza:
         if (c == '@' || numArrobas > 1)
             estado = TOK_Acronimo;
         else if (delimitadoresEmail.find(c) != string::npos)
         {
+            //Nos comememos los delimitadores de los emails
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOKENIZARnormal;
         break;
     }
 }
 
 void Tokenizador::analizaAcronimo(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos,
-                                  bool &salida, int &numPuntoIzquierda, int &numPuntosDerecha) const
+                                  bool &salida, int &numPuntoIzquierda, int &numPuntosDerecha,int &casoAnterior) const
 {
+    casoAnterior = estado;
     switch (estado)
     {
+    /**
+     * Si encontramos un punto a la izquierda lo cogemos, Si encontramos un delimitador
+     * pasamos a palabra compuesta, sino seguimos leyendo el acronimo
+     */
     case TOK_Acronimo:
         npos = pos;
         c = frase[npos];
@@ -448,35 +457,45 @@ void Tokenizador::analizaAcronimo(char &c, int &estado, const string &frase, str
             ++numPuntoIzquierda;
             estado = TOK_Acronimo1;
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOK_Guion;
         else
             estado = TOK_Acronimo2;
         break;
+    /**
+     * Si es un delimitador o otro punto nos salimos a los guiones
+     * si es una letra seguimos en el acronimo
+     */
     case TOK_Acronimo1:
-        if (EsDelimitador(c) || c == '.')
+        if (EsDelimitador(c,casoAnterior) || c == '.')
             estado = TOK_Guion;
         else
             estado = TOK_Acronimo2;
         break;
-
+    /**
+     * Si es un punto a la derecha lo cogemos y seguimos, si es un delimitador nos
+     * pasamos a los guiones
+     */
     case TOK_Acronimo2:
         if (c == '.')
         {
             ++numPuntosDerecha;
             estado = TOK_Acronimo6;
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOK_Guion;
         break;
-
+    /**
+     * Si encontramos un punto a la derecha lo cogemos, Si encontramos un delimitador o letra
+     * tokenizamos todo, si no es un delimitador seguimos analizando
+     */
     case TOK_Acronimo3:
         if (c == '.')
         {
             ++numPuntosDerecha;
             estado = TOK_Acronimo4;
         }
-        else if (EsDelimitador(c) == false)
+        else if (!EsDelimitador(c,casoAnterior))
         {
             --numPuntosDerecha;
             estado = TOK_Acronimo5;
@@ -484,30 +503,41 @@ void Tokenizador::analizaAcronimo(char &c, int &estado, const string &frase, str
         else
             estado = TOKENIZARacronimo;
         break;
-
+    /**
+     * Cogemos el punto a la derecha y seguimos analizando
+     * si es un delimitador paramos y tokenizamos, sino es 
+     * delimitador pasamos a guiones
+     */
     case TOK_Acronimo4:
         if (c == '.')
         {
             ++numPuntosDerecha;
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOKENIZARacronimo;
         else
             estado = TOK_Guion;
         break;
-
+    /**
+     * Si encontramos un punto a la derecha lo cogemos y seguimos analizando
+     * si es un delimitador o los puntos a la derecha son mayores que 2 paramos y tokenizamos
+     */
     case TOK_Acronimo5:
         if (c == '.')
         {
             ++numPuntosDerecha;
             estado = TOK_Acronimo3;
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior) || numPuntosDerecha >= 2)
             estado = TOKENIZARacronimo;
         break;
-
+    /**
+     * Si encontramos otro punto dejamos de analizar y pasamos a guiones
+     * sino es un punto restamos los puntos para no anadirlos al token 
+     * y seguimos analizando
+     */
     case TOK_Acronimo6:
-        if (c == '.' || EsDelimitador(c))
+        if (c == '.' || EsDelimitador(c,casoAnterior))
             estado = TOK_Guion;
         else
         {
@@ -519,8 +549,9 @@ void Tokenizador::analizaAcronimo(char &c, int &estado, const string &frase, str
 }
 
 void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
-                                    int &numGuionesDerecha) const
+                                    int &numGuionesDerecha, int &casoAnterior) const
 {
+    casoAnterior = estado;
     switch (estado)
     {
     /**Si encontramos un delimitador saltamos al estado de Tokenizar Normal
@@ -529,7 +560,7 @@ void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, s
     case TOK_Guion:
         npos = pos;
         c = frase[npos];
-        if (EsDelimitador(c))
+        if (EsDelimitador(c,casoAnterior))
             estado = TOK_Normal;
         else
             estado = TOK_Guion1;
@@ -540,7 +571,7 @@ void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, s
     case TOK_Guion1:
         if (c == '-')
             estado = TOK_Guion2;
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOK_Normal;
         break;
     /**Si volvemos a encontrar un guion o encontramos un delimitdor pasamos a
@@ -548,7 +579,7 @@ void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, s
      * seguimos analizando la palabra compuesta
      */
     case TOK_Guion2:
-        if (c == '-' || EsDelimitador(c))
+        if (c == '-' || EsDelimitador(c,casoAnterior))
             estado = TOK_Normal;
         else
             estado = TOK_Guion3;
@@ -563,7 +594,7 @@ void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, s
             ++numGuionesDerecha;
             estado = TOK_Guion4;
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOKENIZARguion;
         break;
     /**Si encontramos un guion sumamos 1 a nuestro contador y seguimos analizando
@@ -576,7 +607,7 @@ void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, s
             ++numGuionesDerecha;
             estado = TOK_Guion5;
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOKENIZARguion;
         else
         {
@@ -594,7 +625,7 @@ void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, s
             ++numGuionesDerecha;
             // estado = TOK_Guion4
         }
-        else if (EsDelimitador(c))
+        else if (EsDelimitador(c,casoAnterior))
             estado = TOKENIZARguion;
         else
         {
@@ -604,11 +635,12 @@ void Tokenizador::analizaCompuestas(char &c, int &estado, const string &frase, s
 }
 
 void Tokenizador::estadoNormal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
-                               int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha, int &numArrobas) const
+                               int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha, int &numArrobas, int &casoAnterior) const
 {
+    casoAnterior = estado;
     string delim = this->delimiters + " ";
 
-    if (!EsDelimitador(frase[pos]))
+    if (!EsDelimitador(frase[pos],casoAnterior))
     {
         // cout<<frase[pos]<<endl;
         // cout << delim << endl;
@@ -630,6 +662,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
 {
     // Inicializamos el estado a las URL
     int casoEstamos = TOK_URL_HTTP_FTTP;
+    int casoAnterior = -1;
     string delimitadores = delimiters + " ";
     // Caracter que vamos a analizar
     char caracter;
@@ -678,26 +711,26 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
             {
             // Analisis y marcaje de URLs
             case TOK_URL_HTTP_FTTP:
-                analizaURLHTTPFTP(caracter, casoEstamos, frase, pos, npos, salir);
+                analizaURLHTTPFTP(caracter, casoEstamos, frase, pos, npos, salir,casoAnterior);
                 break;
             case TOK_URL:
-                analizaURLyMarcaTokeniza(npos, frase, casoEstamos);
+                analizaURLyMarcaTokeniza(npos, frase, casoEstamos,casoAnterior);
                 break;
 
             // Analisis de n?meros reales
             case TOK_Real:
-            case TOK_Real1:
+            case TOK_AnadeCero:
             case TOK_Real2:
             case TOK_Real3:
             case TOK_Real4:
-                analizaReal(caracter, casoEstamos, frase, pos, npos, salir, delimitadorRealEspecial, anadirCero);
+                analizaReal(caracter, casoEstamos, frase, pos, npos, salir, delimitadorRealEspecial, anadirCero,casoAnterior);
                 break;
 
             // Analisis de emails
             case TOK_Email:
-            case TOK_Email1:
-            case TOK_Email2:
-                analizaEmail(caracter, casoEstamos, frase, pos, npos, salir, numArrobas);
+            case TOK_EmailArroba:
+            case TOK_EmailSaleOTokeniza:
+                analizaEmail(caracter, casoEstamos, frase, pos, npos, salir, numArrobas,casoAnterior);
                 break;
 
             // Analisis de acronimos
@@ -708,7 +741,7 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
             case TOK_Acronimo4:
             case TOK_Acronimo5:
             case TOK_Acronimo6:
-                analizaAcronimo(caracter, casoEstamos, frase, pos, npos, salir, numPuntosIzquierda, numPuntosDerecha);
+                analizaAcronimo(caracter, casoEstamos, frase, pos, npos, salir, numPuntosIzquierda, numPuntosDerecha,casoAnterior);
                 break;
 
             // Analisis de palabras compuestas
@@ -718,12 +751,12 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
             case TOK_Guion3:
             case TOK_Guion4:
             case TOK_Guion5:
-                analizaCompuestas(caracter, casoEstamos, frase, pos, npos, salir, numGuionesDerecha);
+                analizaCompuestas(caracter, casoEstamos, frase, pos, npos, salir, numGuionesDerecha,casoAnterior);
                 break;
 
             // Si el caracter por el que vamos no es un delimi
             case TOK_Normal:
-                estadoNormal(caracter, casoEstamos, frase, pos, npos, salir, numPuntosIzquierda, numGuionesDerecha, numGuionesDerecha, numArrobas);
+                estadoNormal(caracter, casoEstamos, frase, pos, npos, salir, numPuntosIzquierda, numGuionesDerecha, numGuionesDerecha, numArrobas,casoAnterior);
                 break;
             }
             // Casos de tokenizacion y adicion de informacion a tokens
@@ -776,6 +809,10 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
                 }
                 else
                     token = frase.substr(pos, (npos + numGuionesDerecha) - pos);
+                
+                if (token.find(" ")!=string::npos)
+                    token = token.substr(0,token.find(" "));
+
                 break;
             }
 
