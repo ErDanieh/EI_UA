@@ -32,30 +32,28 @@ const int TOK_Real1 = 7;
 const int TOK_Real2 = 8;
 const int TOK_Real3 = 9;
 const int TOK_Real4 = 10;
-const int TOK_Real5 = 11;
 
 // Estatus de revision de emails
-const int TOK_Email = 12;
-const int TOK_Email1 = 13;
-const int TOK_Email2 = 14;
-const int TOK_Email3 = 15;
+const int TOK_Email = 11;
+const int TOK_Email1 = 12;
+const int TOK_Email2 = 13;
 
 // Estatus de revision de Acronimos
-const int TOK_Acronimo = 16;
-const int TOK_Acronimo1 = 17;
-const int TOK_Acronimo2 = 18;
-const int TOK_Acronimo3 = 19;
-const int TOK_Acronimo4 = 20;
-const int TOK_Acronimo5 = 21;
-const int TOK_Acronimo6 = 22;
+const int TOK_Acronimo = 15;
+const int TOK_Acronimo1 = 16;
+const int TOK_Acronimo2 = 17;
+const int TOK_Acronimo3 = 18;
+const int TOK_Acronimo4 = 19;
+const int TOK_Acronimo5 = 20;
+const int TOK_Acronimo6 = 21;
 
 // Estatus de revision de guiones (palabras compuestas)
-const int TOK_Guion = 23;
-const int TOK_Guion1 = 24;
-const int TOK_Guion2 = 25;
-const int TOK_Guion3 = 26;
-const int TOK_Guion4 = 27;
-const int TOK_Guion5 = 28;
+const int TOK_Guion = 22;
+const int TOK_Guion1 = 23;
+const int TOK_Guion2 = 24;
+const int TOK_Guion3 = 25;
+const int TOK_Guion4 = 26;
+const int TOK_Guion5 = 27;
 
 // Estatus de Tokenizacion palabra simple
 const int TOK_Normal = 29;
@@ -146,7 +144,7 @@ private:
                            int &numGuionesDerecha) const;
 
     void estadoNormal(char &c, int &estado, const string &frase, string::size_type &pos, string::size_type &npos, bool &salida,
-                       int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha,int &numArrobas) const;
+                      int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha, int &numArrobas) const;
 
 public:
     static const string delimiters_Siempre;
@@ -221,7 +219,7 @@ public:
      * @return true
      * @return false
      */
-    bool Tokenizar(const string &i) const  { return Tokenizar(i, i + ".tk");}
+    bool Tokenizar(const string &i) const { return Tokenizar(i, i + ".tk"); }
 
     /**
      * @brief

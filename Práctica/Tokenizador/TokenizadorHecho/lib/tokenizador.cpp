@@ -15,7 +15,7 @@ const string Tokenizador::delimiters_Siempre = " \n";
 
 Tokenizador::Tokenizador()
 {
-    this->delimiters = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
+    this->delimiters = ",;:.-/+*\\ '\"{}[]()<>ï¿½!ï¿½?&#=\t\n\r@";
     this->casosEspeciales = true;
     this->pasarAminuscSinAcentos = false;
 }
@@ -216,7 +216,7 @@ bool Tokenizador::TokenizarDirectorio(const string &i) const
 
 void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
 {
-    // Solo si los casos especiales están activados se añadirán los delimitadores que siempre se activan
+    // Solo si los casos especiales estï¿½n activados se aï¿½adirï¿½n los delimitadores que siempre se activan
     // el salto de linea y el espacio
     EliminarRepetidos(this->delimiters = nuevoDelimiters);
 }
@@ -366,7 +366,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
         else if (delimitadorDeReales(c))
         {
             delimitadorRealEspecial = true;
-            estado = TOK_Real5;
+            estado = TOK_Real4;
         }
         else if (c < '0' || c > '9') // Si encontramos una letra pasamos a los emails
             estado = TOK_Email;
@@ -383,7 +383,7 @@ void Tokenizador::analizaReal(char &c, int &estado, const string &frase, string:
         else
             estado = TOK_Email;
         break;
-    case TOK_Real5:
+    case TOK_Real4:
         if (EsDelimitador(c))
         {
             estado = TOKENIZARreal;
@@ -690,7 +690,6 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
             case TOK_Real2:
             case TOK_Real3:
             case TOK_Real4:
-            case TOK_Real5:
                 analizaReal(caracter, casoEstamos, frase, pos, npos, salir, delimitadorRealEspecial, anadirCero);
                 break;
 
@@ -698,7 +697,6 @@ void Tokenizador::UsandoCasosEspeciales(list<string> &tokens, const string &fras
             case TOK_Email:
             case TOK_Email1:
             case TOK_Email2:
-            case TOK_Email3:
                 analizaEmail(caracter, casoEstamos, frase, pos, npos, salir, numArrobas);
                 break;
 
