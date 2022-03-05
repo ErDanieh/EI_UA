@@ -533,11 +533,10 @@ void Tokenizador::analizaAcronimo(char &c, int &estado, const string &frase, str
         break;
     /**
      * Si encontramos otro punto dejamos de analizar y pasamos a guiones
-     * sino es un punto restamos los puntos para no anadirlos al token 
-     * y seguimos analizando
+     * sino es un punto restamos los puntos para no anadirlos al otkm
      */
     case TOK_Acronimo6:
-        if (c == '.' || EsDelimitador(c,casoAnterior))
+        if (c == '.' || EsDelimitador(c,casoAnterior) || numPuntosDerecha >= 2)
             estado = TOK_Guion;
         else
         {
