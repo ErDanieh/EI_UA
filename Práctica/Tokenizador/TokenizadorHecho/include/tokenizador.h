@@ -40,19 +40,19 @@ const int TOK_EmailSaleOTokeniza = 13;
 
 // Estatus de revision de Acronimos
 const int TOK_Acronimo = 15;
-const int TOK_Acronimo1 = 16;
-const int TOK_Acronimo2 = 17;
-const int TOK_Acronimo3 = 18;
-const int TOK_Acronimo4 = 19;
-const int TOK_Acronimo5 = 20;
-const int TOK_Acronimo6 = 21;
+const int TOK_AcronimoDelimExit = 16;
+const int TOK_AcronimoPuntosDer = 17;
+const int TOK_AcronimoPuntosDer2 = 18;
+const int TOK_AcronimoPuntosDer3 = 19;
+const int TOK_AcronimoPuntosDer4 = 20;
+const int TOK_AcronimoFin = 21;
 
 // Estatus de revision de guiones (palabras compuestas)
 const int TOK_Guion = 22;
-const int TOK_Guion1 = 23;
-const int TOK_Guion2 = 24;
+const int TOK_GuionPrimero = 23;
+const int TOK_GuionFinSiGuion = 24;
 const int TOK_Guion3 = 25;
-const int TOK_Guion4 = 26;
+const int TOK_GuionFinOElimExtras = 26;
 const int TOK_Guion5 = 27;
 
 // Estatus de Tokenizacion palabra simple
