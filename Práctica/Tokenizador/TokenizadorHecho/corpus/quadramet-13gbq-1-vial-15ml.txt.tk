@@ -72,8 +72,7 @@ de
 aproximadamente
 28
 a
-6
-5
+65
 MBq/g
 de
 samario
@@ -1556,8 +1555,7 @@ desde
 0,7
 %
 hasta
-0,0
-5
+0,05
 ±
 0,03
 %
@@ -2021,8 +2019,7 @@ la
 Farmacopea
 Europea,
 de
-1
-5
+15
 ml,
 cerrado
 con
@@ -2380,8 +2377,7 @@ Pared
 del
 colon
 ascendente
-0,00
-5
+0,005
 Pared
 del
 colon
@@ -2392,13 +2388,11 @@ delgado
 0,006
 Pared
 miocárdica
-0,00
-5
+0,005
 Riñones
 0,018
 Hígado
-0,00
-5
+0,005
 Pulmones
 0,008
 Músculo
@@ -2406,8 +2400,7 @@ Músculo
 Ovarios
 0,008
 Páncreas
-0,00
-5
+0,005
 Médula
 ósea
 1,54
@@ -2421,8 +2414,7 @@ Bazo
 Estómago
 0,004
 Testículos
-0,00
-5
+0,005
 Timo
 0,004
 Tiroides
@@ -3057,7 +3049,7 @@ sujeto
 a
 prescripción
 médica.
-15.
+15
 INSTRUCCIONES
 DE
 USO
@@ -3296,7 +3288,7 @@ elemento
 radiactivo,
 el
 samario
-153,
+153
 administra
 radiación
 local
@@ -4250,8 +4242,7 @@ la
 Farmacopea
 Europea,
 de
-1
-5
+15
 ml,
 cerrado
 con
