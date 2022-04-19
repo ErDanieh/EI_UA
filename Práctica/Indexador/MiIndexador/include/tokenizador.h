@@ -61,7 +61,7 @@ const int TOK_Normal = 29;
 // Delimitadores Frecuentes que aparecen en URLs "_:/.?&-=#@"
 const string delimitadoresURL = "_:/.?&-=#@";
 // Delimitadores Frecuentes que aparecen en numeros reales
-const string delimitadoresReal = char(37) + char(36) + "ªº" ;
+const string delimitadoresReal = char(37) + char(36) + "ªº";
 // Delimitadores Frecuentes que aparecen en emails
 const string delimitadoresEmail = "-_.";
 

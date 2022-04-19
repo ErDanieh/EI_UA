@@ -64,11 +64,11 @@ string Tokenizador::normalizaAcentosMinusculas(const string &palabra) const
 {
 
     string palabraAux = palabra;
-    char ISO[260]= "                                 !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[ ]^_`abcdefghijklmnopqrstuvwxyz{|}~ ? ,                                                            ¿aaaaaa ceeeeiiii  ooooo  uuuuy  aaaaaa ceeeeiiii  ooooo  uuuuy y";
-    ISO[241]= ISO[209]= 'ñ';
+    char ISO[260] = "                                 !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[ ]^_`abcdefghijklmnopqrstuvwxyz{|}~ ? ,                                                            ï¿½aaaaaa ceeeeiiii  ooooo  uuuuy  aaaaaa ceeeeiiii  ooooo  uuuuy y";
+    ISO[241] = ISO[209] = 'ï¿½';
     for (int i = 0; i < palabraAux.size(); i++)
         palabraAux[i] = ISO[(unsigned char)palabra[i]];
-    
+
     return palabraAux;
 }
 

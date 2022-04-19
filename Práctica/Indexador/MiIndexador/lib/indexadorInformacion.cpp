@@ -61,11 +61,14 @@ bool Fecha::operator<(const Fecha &f) const
         return false;
 }
 
+
 // Operador mayor que para comparar dos fechas
 bool Fecha::operator>(const Fecha &f) const
 {
     return !(*this < f);
 }
+
+
 
 // Operador igual para asignar los mismos valores de una fecha a otra
 Fecha &Fecha::operator=(const Fecha &f)
@@ -84,69 +87,61 @@ Fecha &Fecha::operator=(const Fecha &f)
 
 ////////////////////////////////////////////////////////////////////////////
 
-// Constructor de informacionPregunta
-InformacionPregunta::InformacionPregunta()
+InformacionTermino::InformacionTermino()
 {
-    this->numTotalPal = 0;
-    this->numTotalPalSinParada = 0;
-    this->numTotalPalDiferentes = 0;
+    this->ftc = 0;
 }
 
-// Constructor copia
-InformacionPregunta::InformacionPregunta(const InformacionPregunta &p)
+InformacionTermino::InformacionTermino(const InformacionTermino &t)
 {
-    this->numTotalPal = p.numTotalPal;
-    this->numTotalPalSinParada = p.numTotalPalSinParada;
-    this->numTotalPalDiferentes = p.numTotalPalDiferentes;
+    this->ftc = t.ftc;
+    this->l_docs = t.l_docs;
 }
 
-// Destructor de informacionPregunta
-InformacionPregunta::~InformacionPregunta()
+InformacionTermino::~InformacionTermino()
 {
-    this->numTotalPal = 0;
-    this->numTotalPalDiferentes = 0;
-    this->numTotalPalSinParada = 0;
+    this->ftc = 0;
+    this->l_docs.clear();
 }
 
-// Operador igual para asignar los mismos valores de una informacionPregunta a otra
-InformacionPregunta &InformacionPregunta::operator=(const InformacionPregunta &p)
+InformacionTermino &InformacionTermino::operator=(const InformacionTermino &t)
 {
-    if (this != &p)
+    if (this != &t)
     {
-        this->numTotalPal = p.numTotalPal;
-        this->numTotalPalSinParada = p.numTotalPalSinParada;
-        this->numTotalPalDiferentes = p.numTotalPalDiferentes;
+        this->ftc = t.ftc;
+        this->l_docs = t.l_docs;
     }
     return (*this);
 }
 
-// Operador salida
-ostream &operator<<(ostream &os, const InformacionPregunta &p)
+ostream &operator<<(ostream &os, const InformacionTermino &t)
 {
-    os << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: " << p.numTotalPalSinParada << "\tnumTotalPalSinParada: " << p.numTotalPalDiferentes;
+    os << "Frecuencia total: " << t.ftc << "\tfd: " << t.l_docs.size();
+    for (auto it = t.l_docs.begin(); it != t.l_docs.end(); ++it)
+        os << "\t"
+           << "Id.Doc: " << it->first << "\t" << it->second;
     return os;
 }
-////////////////////////////////////////////////////////////////////////////
 
-// Constructor InformacionTerminoPregunta
-InformacionTerminoPregunta::InformacionTerminoPregunta()
+////////////////////////////////////////////////////////////////////////////
+InfTermDoc::InfTermDoc()
 {
     this->ft = 0;
 }
 
-InformacionTerminoPregunta::InformacionTerminoPregunta(const InformacionTerminoPregunta &t)
+InfTermDoc::InfTermDoc(const InfTermDoc &t)
 {
     this->ft = t.ft;
     this->posTerm = t.posTerm;
 }
 
-InformacionTerminoPregunta::~InformacionTerminoPregunta()
+InfTermDoc::~InfTermDoc()
 {
     this->ft = 0;
     this->posTerm.clear();
 }
 
-InformacionTerminoPregunta &InformacionTerminoPregunta::operator=(const InformacionTerminoPregunta &t)
+InfTermDoc &InfTermDoc::operator=(const InfTermDoc &t)
 {
     if (this != &t)
     {
@@ -156,11 +151,75 @@ InformacionTerminoPregunta &InformacionTerminoPregunta::operator=(const Informac
     return (*this);
 }
 
-ostream &operator<<(ostream &os, const InformacionTerminoPregunta &t)
+ostream &operator<<(ostream &os, const InfTermDoc &t)
 {
-    os << "ft: " << t.ft;
+    os << "ft: " << t.ft << "\t";
     for (auto it = t.posTerm.begin(); it != t.posTerm.end(); ++it)
-        os << "\t" << *it;
+    {
+        if (it == t.posTerm.begin())
+        {
+            os << *it;
+        }
+        else
+        {
+            os << "\t" << *it;
+        }
+    }
+
+    return os;
+}
+////////////////////////////////////////////////////////////////////////////
+// Constructor InfDoc
+InfDoc::InfDoc()
+{
+    this->idDoc = 0;
+    this->numPal = 0;
+    this->numPalSinParada = 0;
+    this->numPalDiferentes = 0;
+    this->tamBytes = 0;
+    this->fechaModificacion = NULL;
+}
+
+InfDoc::InfDoc(const InfDoc &d)
+{
+    this->idDoc = d.idDoc;
+    this->numPal = d.numPal;
+    this->numPalSinParada = d.numPalSinParada;
+    this->numPalDiferentes = d.numPalDiferentes;
+    this->tamBytes = d.tamBytes;
+    this->fechaModificacion = d.fechaModificacion;
+}
+
+InfDoc::~InfDoc()
+{
+    this->idDoc = 0;
+    this->numPal = 0;
+    this->numPalSinParada = 0;
+    this->numPalDiferentes = 0;
+    this->tamBytes = 0;
+    this->fechaModificacion = NULL;
+}
+
+InfDoc &InfDoc::operator=(const InfDoc &d)
+{
+    if (this != &d)
+    {
+        this->idDoc = d.idDoc;
+        this->numPal = d.numPal;
+        this->numPalSinParada = d.numPalSinParada;
+        this->numPalDiferentes = d.numPalDiferentes;
+        this->tamBytes = d.tamBytes;
+        this->fechaModificacion = d.fechaModificacion;
+    }
+    return (*this);
+}
+
+ostream &operator<<(ostream &os, const InfDoc &d)
+{
+    os << "idDoc: " << d.idDoc << "\tnumPal: " << d.numPal
+       << "\tnumPalSinParada: " << d.numPalSinParada
+       << "\tnumPalDiferentes: " << d.numPalDiferentes
+       << "\ttamBytes: " << d.tamBytes;
     return os;
 }
 
@@ -214,24 +273,84 @@ ostream &operator<<(ostream &os, const InfColeccionDocs &c)
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// Constructor InfDoc
-InfDoc::InfDoc()
+// Constructor InformacionTerminoPregunta
+InformacionTerminoPregunta::InformacionTerminoPregunta()
 {
-    this->idDoc = 0;
-    this->numPal = 0;
-    this->numPalSinParada = 0;
-    this->numPalDiferentes = 0;
-    this->tamBytes = 0;
-    this->fechaModificacion = NULL;
-
+    this->ft = 0;
 }
 
-InfDoc::InfDoc(const InfDoc &d)
+InformacionTerminoPregunta::InformacionTerminoPregunta(const InformacionTerminoPregunta &t)
 {
-    this->idDoc = d.idDoc;
-    this->numPal = d.numPal;
-    this->numPalSinParada = d.numPalSinParada;
-    this->numPalDiferentes = d.numPalDiferentes;
-    this->tamBytes = d.tamBytes;
-    this->fechaModificacion = d.fechaModificacion;
+    this->ft = t.ft;
+    this->posTerm = t.posTerm;
 }
+
+InformacionTerminoPregunta::~InformacionTerminoPregunta()
+{
+    this->ft = 0;
+    this->posTerm.clear();
+}
+
+InformacionTerminoPregunta &InformacionTerminoPregunta::operator=(const InformacionTerminoPregunta &t)
+{
+    if (this != &t)
+    {
+        this->ft = t.ft;
+        this->posTerm = t.posTerm;
+    }
+    return (*this);
+}
+
+ostream &operator<<(ostream &os, const InformacionTerminoPregunta &t)
+{
+    os << "ft: " << t.ft;
+    for (auto it = t.posTerm.begin(); it != t.posTerm.end(); ++it)
+        os << "\t" << *it;
+    return os;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+// Constructor de informacionPregunta
+InformacionPregunta::InformacionPregunta()
+{
+    this->numTotalPal = 0;
+    this->numTotalPalSinParada = 0;
+    this->numTotalPalDiferentes = 0;
+}
+
+// Constructor copia
+InformacionPregunta::InformacionPregunta(const InformacionPregunta &p)
+{
+    this->numTotalPal = p.numTotalPal;
+    this->numTotalPalSinParada = p.numTotalPalSinParada;
+    this->numTotalPalDiferentes = p.numTotalPalDiferentes;
+}
+
+// Destructor de informacionPregunta
+InformacionPregunta::~InformacionPregunta()
+{
+    this->numTotalPal = 0;
+    this->numTotalPalDiferentes = 0;
+    this->numTotalPalSinParada = 0;
+}
+
+// Operador igual para asignar los mismos valores de una informacionPregunta a otra
+InformacionPregunta &InformacionPregunta::operator=(const InformacionPregunta &p)
+{
+    if (this != &p)
+    {
+        this->numTotalPal = p.numTotalPal;
+        this->numTotalPalSinParada = p.numTotalPalSinParada;
+        this->numTotalPalDiferentes = p.numTotalPalDiferentes;
+    }
+    return (*this);
+}
+
+// Operador salida
+ostream &operator<<(ostream &os, const InformacionPregunta &p)
+{
+    os << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: " << p.numTotalPalSinParada << "\tnumTotalPalSinParada: " << p.numTotalPalDiferentes;
+    return os;
+}
+////////////////////////////////////////////////////////////////////////////

@@ -1,13 +1,26 @@
 #ifndef _INDEXADORHASH_H_
 #define _INDEXADORHASH_H_
 
+// Mis librerias
+#include "indexadorInformacion.h"
+#include "stemmer.h"
+#include "tokenizador.h"
+
+// Librerias de c++
 #include <iostream>
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "indexadorInformacion.h"
-#include "stemmer.h"
-#include "tokenizador.h"
+#include <list>
+#include <unistd.h>
+#include <stdio.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include <tr1/unordered_map>
+#include <tr1/unordered_set>
 
 using namespace std;
 
@@ -89,9 +102,9 @@ public:
 
     string DevolverDelimitadores() const;
 
-    bool DevolverCasosEspeciales() const;
+    bool DevolverCasosEspeciales();
 
-    bool DevolverPasarAminuscSinAcentos() const;
+    bool DevolverPasarAminuscSinAcentos();
 
     bool DevolverAlmacenarPosTerm() const;
 
@@ -136,10 +149,10 @@ private:
     // Información recogida de la pregunta indexada. Se almacenará en memoria principal
     InformacionPregunta infPregunta;
 
-    unordered_set<string> stopWords;
+    tr1::unordered_set<string> stopWords;
 
     // Nombre del fichero que contiene las palabras de parada
-    unordered_set<string> stopWords;
+    string ficheroStopWords;
 
     Tokenizador tok;
 

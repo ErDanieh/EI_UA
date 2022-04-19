@@ -8,28 +8,7 @@
 #include <list>
 
 using namespace std;
-
-class InformacionTermino
-{
-    friend ostream &operator<<(ostream &s, const InformacionTermino &p);
-
-public:
-    InformacionTermino(const InformacionTermino &);
-    InformacionTermino();  // Inicializa ftc = 0
-    ~InformacionTermino(); // Pone ftc = 0 y vacÃ­a l_docs
-    InformacionTermino &operator=(const InformacionTermino &);
-    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
-private:
-    // Frecuencia total del tÃ©rmino en la colecciÃ³n
-    int ftc;
-    /** Tabla Hash que se accederÃ¡ por el id del documento, devolviendo un
-     *  objeto de la clase InfTermDoc que contiene toda la informaciÃ³n de
-     *  apariciÃ³n del tÃ©rmino en el documento
-     * */
-    unordered_map<int, InfTermDoc> l_docs;
-};
-/////////////////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 class InfTermDoc
 {
     friend ostream &operator<<(ostream &s, const InfTermDoc &p);
@@ -52,6 +31,50 @@ private:
     ordenada de menor a mayor posiciÃ³n.
     **/
     list<int> posTerm;
+};
+/////////////////////////////////////////////////////////////////////////////////////////
+class InformacionTermino
+{
+    friend ostream &operator<<(ostream &s, const InformacionTermino &p);
+
+public:
+    InformacionTermino(const InformacionTermino &);
+    InformacionTermino();  // Inicializa ftc = 0
+    ~InformacionTermino(); // Pone ftc = 0 y vacÃ­a l_docs
+    InformacionTermino &operator=(const InformacionTermino &);
+    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
+private:
+    // Frecuencia total del tÃ©rmino en la colecciÃ³n
+    int ftc;
+    /** Tabla Hash que se accederÃ¡ por el id del documento, devolviendo un
+     *  objeto de la clase InfTermDoc que contiene toda la informaciÃ³n de
+     *  apariciÃ³n del tÃ©rmino en el documento
+     * */
+    unordered_map<int, InfTermDoc> l_docs;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Esta es mi implementacion de las fechas para los archivos,
+ * utilizaremos la estructura del clock para obtener los datos
+ * de la fecha y hora
+ */
+class Fecha
+{
+    int dia;
+    int mes;
+    int anyo;
+    int hora;
+    int min;
+    int seg;
+
+public:
+    Fecha();
+    Fecha(struct tm *clock);
+    Fecha(const Fecha &);
+    bool operator<(const Fecha &f) const;
+    bool operator>(const Fecha &f) const;
+    Fecha& operator=(const Fecha &f);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,27 +173,4 @@ private:
     int numTotalPalDiferentes;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Esta es mi implementacion de las fechas para los archivos,
- * utilizaremos la estructura del clock para obtener los datos
- * de la fecha y hora
- */
-class Fecha
-{
-    int dia;
-    int mes;
-    int anyo;
-    int hora;
-    int min;
-    int seg;
-
-public:
-    Fecha();
-    Fecha(struct tm *clock);
-    Fecha(const Fecha &);
-    bool operator<(const Fecha &f) const;
-    bool operator>(const Fecha &f) const;
-    bool operator==(const Fecha &f) const;
-};
 #endif
