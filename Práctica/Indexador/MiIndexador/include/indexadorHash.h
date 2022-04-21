@@ -64,10 +64,33 @@ public:
 
     bool IndexarPregunta(const string &preg);
 
+    /**
+     * @brief Busca una pregunta indexada que contenga al menos un termino
+     * que no sea palabra de parada
+     *
+     * @param preg pregunta que se ha encontrado
+     * @return true si se encuentra una pregunta indexada
+     * @return false si no se encuentra una pregunta indexada
+     */
     bool DevuelvePregunta(string &preg) const;
 
+    /**
+     * @brief Se aplica stemming y las mayusculas a word y se busca en la pregunta indexada y lo devuelve en inf
+     * 
+     * @param word termino a buscar
+     * @param inf informacion que se devuelve puede devolverse vacio
+     * @return true si se encuentra el termino
+     * @return false si no se encuentra el termino
+     */
     bool DevuelvePregunta(const string &word, InformacionTerminoPregunta &inf) const;
 
+    /**
+     * @brief Devuelve si hay alguna pregunta indexada
+     * 
+     * @param inf donde se devuelve la informacion de la pregunta
+     * @return true si hay alguna pregunta indexada
+     * @return false si no hay ninguna pregunta indexada
+     */
     bool DevuelvePregunta(InformacionPregunta &inf) const;
 
     void ImprimirIndexacionPregunta() const;

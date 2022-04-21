@@ -59,8 +59,7 @@ IndexadorHash::IndexadorHash(const string &fichStopWords, const string &delimita
 
 IndexadorHash::IndexadorHash(const string &directorioIndexacion) {}
 
-
-//Constrcutor de copia
+// Constrcutor de copia
 IndexadorHash::IndexadorHash(const IndexadorHash &ind)
 {
     this->ficheroStopWords = ind.ficheroStopWords;
@@ -96,9 +95,32 @@ IndexadorHash::~IndexadorHash()
     this->almacenarPosTerm = false;
 }
 
-IndexadorHash &IndexadorHash::operator=(const IndexadorHash &ind) {}
+IndexadorHash &IndexadorHash::operator=(const IndexadorHash &ind)
+{
+    if (this != &ind)
+    {
+        this->ficheroStopWords = ind.ficheroStopWords;
+        this->stopWords = ind.stopWords;
+        this->tok = ind.tok;
+        this->tipoStemmer = ind.tipoStemmer;
+        this->directorioIndice = ind.directorioIndice;
+        this->informacionColeccionDocs = ind.informacionColeccionDocs;
+        this->almacenarEnDisco = ind.almacenarEnDisco;
+        this->almacenarPosTerm = ind.almacenarPosTerm;
+        this->indice = ind.indice;
+        this->indiceDocs = ind.indiceDocs;
 
-bool IndexadorHash::Indexar(const string &ficheroDocumentos) {}
+        this->indicePregunta = ind.indicePregunta;
+        this->infPregunta = ind.infPregunta;
+        this->pregunta = ind.pregunta;
+    }
+    return *this;
+}
+
+bool IndexadorHash::Indexar(const string &ficheroDocumentos)
+{
+    
+}
 
 bool IndexadorHash::IndexarDirectorio(const string &dirAIndexar) {}
 
@@ -118,18 +140,42 @@ bool IndexadorHash::DevuelvePregunta(string &preg) const
         return true;
     }
     else
-    {
         return false;
-    }
 }
 
-bool IndexadorHash::DevuelvePregunta(const string &word, InformacionTerminoPregunta &inf) const {}
+bool IndexadorHash::DevuelvePregunta(const string &word, InformacionTerminoPregunta &inf) const
+{
+    // Buscamos el termino en el indice de pregunta mediante un iterador
+    auto it = indicePregunta.find(word);
 
-bool IndexadorHash::DevuelvePregunta(InformacionPregunta &inf) const {}
+    if (it != indicePregunta.end())
+    {
+        // Si lo encontramos se devuelve la informacion dentro del inf
+        inf = it->second;
+        return true;
+    }
+    else
+        return false;
+}
+
+bool IndexadorHash::DevuelvePregunta(InformacionPregunta &inf) const
+{
+    if (!this->pregunta.empty())
+    {
+        inf = this->infPregunta;
+        return true;
+    }
+    else
+        return false;
+}
 
 void IndexadorHash::ImprimirIndexacionPregunta() const {}
 
-void IndexadorHash::ImprimirPregunta() {}
+void IndexadorHash::ImprimirPregunta()
+{
+    cout << "Pregunta indexada : " << this->pregunta << "\n";
+    cout << "Informacion de la pregunta : " << this->infPregunta << "\n";
+}
 
 bool IndexadorHash::Devuelve(const string &word, InformacionTermino &inf) const {}
 
