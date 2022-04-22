@@ -158,10 +158,10 @@ private:
     IndexadorHash();
 
     // Índice de términos indexados accesible por el término
-    unordered_map<string, InformacionTermino> indice;
+    tr1::unordered_map<string, InformacionTermino> indice;
 
     // Índice de documentos indexados accesible por el nombre del documento
-    unordered_map<string, InfDoc> indiceDocs;
+    tr1::unordered_map<string, InfDoc> indiceDocs;
 
     // Información recogida de la colección de documentos indexada
     InfColeccionDocs informacionColeccionDocs;
@@ -170,7 +170,7 @@ private:
     string pregunta;
 
     // Índice de términos indexados en una pregunta. Se almacenará en memoria principal
-    unordered_map<string, InformacionTerminoPregunta> indicePregunta;
+    tr1::unordered_map<string, InformacionTerminoPregunta> indicePregunta;
 
     // Información recogida de la pregunta indexada. Se almacenará en memoria principal
     InformacionPregunta infPregunta;

@@ -211,14 +211,13 @@ ostream &operator<<(ostream &os, const InfTermDoc &t)
 }
 ////////////////////////////////////////////////////////////////////////////
 // Constructor InfDoc
-InfDoc::InfDoc()
+InfDoc::InfDoc() : fechaModificacion(),
+                   idDoc(0),
+                   numPal(0),
+                   numPalSinParada(0),
+                   numPalDiferentes(0),
+                   tamBytes(0)
 {
-    this->idDoc = 0;
-    this->numPal = 0;
-    this->numPalSinParada = 0;
-    this->numPalDiferentes = 0;
-    this->tamBytes = 0;
-    this->fechaModificacion = NULL;
 }
 
 InfDoc::InfDoc(const InfDoc &d)
@@ -238,7 +237,6 @@ InfDoc::~InfDoc()
     this->numPalSinParada = 0;
     this->numPalDiferentes = 0;
     this->tamBytes = 0;
-    this->fechaModificacion = NULL;
 }
 
 InfDoc &InfDoc::operator=(const InfDoc &d)

@@ -137,7 +137,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
         // Cojo el nonbre de un documento
         while (getline(nombresDocumentos, documentoAnalizo))
         {
-            cout<<"Analizando documento : "<<documentoAnalizo<<endl;
+            //cout << "Analizando documento : " << documentoAnalizo << endl;
             auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
             // Reinicio los valores que necesito
             idDocumentoAuxiliar = 0;
@@ -152,7 +152,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
             // Comprobamos que el fichero no esta en el indice
             if (itIndiceDocumentos == indiceDocs.end())
             {
-                cout<<"El documento no esta en el indice"<<endl;
+                //cout << "El documento no esta en el indice" << endl;
                 // Como no hemos encontrado el fichero entonces lo indexamos
                 procederIndexacion = true;
             }
@@ -172,7 +172,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                 // Borramos el documento del indice para poder volver a indexarlo
                 if (!BorraDoc(documentoAnalizo))
                 {
-                    cout<<"No se ha podido borrar el documento del indice"<<endl;
+                    //cout << "No se ha podido borrar el documento del indice" << endl;
                     cerr << "No se ha podido borrar el documento " << documentoAnalizo << "\n";
                     return false;
                 }
@@ -181,7 +181,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
             // Procedemos a la indexacion si lo necesitamos
             if (procederIndexacion)
             {
-                cout<<documentoAnalizo<<endl;
+                //cout << documentoAnalizo << endl;
                 // Abrimos el documento que estamos analizando para leerlo
                 documentoAnalizoFich.open(documentoAnalizo.c_str(), ifstream::in);
 
@@ -195,7 +195,11 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                 }
                 else // Si si que se puede abrir
                 {
+                    //cout << "he abierto el documento" << endl;
+
                     InfDoc informacioDocumentoAnalizo;
+                    //cout << "Voy a insertar la informacion" << endl;
+
                     // Empezamos a meterle la informacion
                     if (idDocumentoAuxiliar != 0)
                     {
@@ -209,9 +213,12 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     informacioDocumentoAnalizo.setTamBytes(infoDocumento.st_size);
                     informacioDocumentoAnalizo.setFechaModificacion(fechaModificacionDoc);
 
+                    //cout << "he asignado la informacion" << endl;
+
                     // Leemos la linea del documento
                     while (getline(documentoAnalizoFich, lineaAnalizo))
                     {
+                       //cout << lineaAnalizo << endl;
                         // Sacamos los tokens de la linea
                         tok.Tokenizar(lineaAnalizo, tokensLineaAnalizo);
                         // Asignamos la cantidad de palabras que tiene el documento
@@ -273,6 +280,8 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                     informacionTodosTerminos.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoEnDocumento);
                                     // Insertamos el termino en el indice
                                     indice.insert(pair<string, InformacionTermino>((*itTokens), informacionTodosTerminos));
+                                    //cout << informacionTodosTerminos << endl;
+                                    //cout << informacionTerminoEnDocumento << endl;
                                 }
                             }
                             ++posTermino;
@@ -280,12 +289,19 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
 
                         lineaAnalizo.clear();
                     }
+                    //cout << "he analizado bien" << endl;
                     // Ahora que tenemos todos los nuevos terminos y los documentos debemos actualizar nuestra coleccion
                     informacionColeccionDocs.setNumTotalPal(informacionColeccionDocs.getNumTotalPal() + informacioDocumentoAnalizo.getNumPal());
                     informacionColeccionDocs.setNumTotalPalSinParada(informacionColeccionDocs.getNumTotalPalSinParada() + informacioDocumentoAnalizo.getNumPalSinParada());
                     informacionColeccionDocs.setNumTotalPalDiferentes(informacionColeccionDocs.getNumTotalPalDiferentes() + informacioDocumentoAnalizo.getNumPalDiferentes());
+                    //cout << "he seteado el total de palabras" << endl;
+
                     // Insertamos el documento en la coleccion
-                    indiceDocs.insert({documentoAnalizo, informacioDocumentoAnalizo});
+                    //cout << documentoAnalizo << endl;
+                    //cout << informacioDocumentoAnalizo << endl;
+                    this->indiceDocs.insert({documentoAnalizo, informacioDocumentoAnalizo});
+                    //cout << "todo de locos " << endl;
+                    documentoAnalizoFich.close();
                 }
             }
         }
