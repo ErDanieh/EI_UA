@@ -123,7 +123,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
     ifstream nombresDocumentos(ficheroDocumentos, ifstream::in);
     // Informacion del documento que necesito para indexar
     string documentoAnalizo, lineaAnalizo;
-    bool procederIndexacion;
+    bool procederIndexacion = false;
     struct stat infoDocumento;
     int idDocumentoAuxiliar;
     list<string> tokensLineaAnalizo;
@@ -133,10 +133,11 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
     if (nombresDocumentos.good())
     {
         ifstream documentoAnalizoFich;
-        documentoAnalizo.clear();
+        documentoAnalizo = "";
         // Cojo el nonbre de un documento
         while (getline(nombresDocumentos, documentoAnalizo))
         {
+            cout<<"Analizando documento : "<<documentoAnalizo<<endl;
             auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
             // Reinicio los valores que necesito
             idDocumentoAuxiliar = 0;
@@ -151,6 +152,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
             // Comprobamos que el fichero no esta en el indice
             if (itIndiceDocumentos == indiceDocs.end())
             {
+                cout<<"El documento no esta en el indice"<<endl;
                 // Como no hemos encontrado el fichero entonces lo indexamos
                 procederIndexacion = true;
             }
@@ -170,6 +172,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                 // Borramos el documento del indice para poder volver a indexarlo
                 if (!BorraDoc(documentoAnalizo))
                 {
+                    cout<<"No se ha podido borrar el documento del indice"<<endl;
                     cerr << "No se ha podido borrar el documento " << documentoAnalizo << "\n";
                     return false;
                 }
@@ -178,8 +181,9 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
             // Procedemos a la indexacion si lo necesitamos
             if (procederIndexacion)
             {
+                cout<<documentoAnalizo<<endl;
                 // Abrimos el documento que estamos analizando para leerlo
-                documentoAnalizoFich.open(documentoAnalizo, ifstream::in);
+                documentoAnalizoFich.open(documentoAnalizo.c_str(), ifstream::in);
 
                 // Si no se ha podido abrir el documento
                 if (!documentoAnalizoFich.good())
@@ -247,6 +251,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                         informacionTerminoDocumento.setPosTerm(posTermino);
                                         PalabrasIndice->second.getL_docs().insert(pair<int, InfTermDoc>(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento));
                                     }
+                                    PalabrasIndice->second.setFtc(PalabrasIndice->second.getFtc() + 1);
                                 }
                                 else // Si el termino no existe lo que vamos a hacer es insertarlo
                                 {
