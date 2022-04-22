@@ -1,5 +1,5 @@
 #include "indexadorHash.h"
-#include "Tokenizador.h"
+#include "tokenizador.h"
 
 ostream &operator<<(ostream &s, const IndexadorHash &p)
 {
