@@ -27,6 +27,12 @@ public:
     ~InfTermDoc(); // Pone ft = 0
     // Operador igual para asignar los mismos valores de una informacionTermino a otra
     InfTermDoc &operator=(const InfTermDoc &);
+    // Getters
+    int getFt() const;
+    list<int> getPosTerm() const;
+    // Setters
+    void setFt(int ft);
+    void setPosTerm(int posTerm);
 
 private:
     // Frecuencia del termino en el documento
@@ -56,15 +62,22 @@ public:
     // Operador igual para asignar los mismos valores de una informacionTermino a otra
     InformacionTermino &operator=(const InformacionTermino &);
 
-private:
-    // Frecuencia total del termino en la coleccion
-    int ftc;
-
     /** Tabla Hash que se accedera por el id del documento, devolviendo un
      *  objeto de la clase InfTermDoc que contiene toda la informacion de
      *  aparicion del termino en el documento
      *  El int es el id del documento y InfTermDoc es la informacion de los terminos de cada documento
      * */
+
+    // Getters y setters
+    int getFtc() const;
+    void setFtc(int ftc);
+    void insertarDoc(int idDoc, InfTermDoc &infTermDoc);
+    InfTermDoc getInfTermDoc(int idDoc);
+    unordered_map<int, InfTermDoc> getL_docs() const;
+
+private:
+    // Frecuencia total del termino en la coleccion
+    int ftc;
     unordered_map<int, InfTermDoc> l_docs;
 };
 
@@ -111,6 +124,22 @@ public:
     // Operador igual para asignar los mismos valores de una informacionDocumento a otra
     InfDoc &operator=(const InfDoc &);
 
+    // Getters
+    int getIdDoc() const;
+    int getNumPal() const;
+    int getNumPalSinParada() const;
+    int getNumPalDiferentes() const;
+    int getTamBytes() const;
+    Fecha getFechaModificacion() const;
+
+    // Setters
+    void setIdDoc(int idDoc);
+    void setNumPal(int numPal);
+    void setNumPalSinParada(int numPalSinParada);
+    void setNumPalDiferentes(int numPalDiferentes);
+    void setTamBytes(int tamBytes);
+    void setFechaModificacion(Fecha fechaModificacion);
+
 private:
     // Identificador del documento. Empieza por el 1
     int idDoc;
@@ -148,6 +177,20 @@ public:
     // Operador igual para asignar los mismos valores de una informacionColeccionDocs a otra
     InfColeccionDocs &operator=(const InfColeccionDocs &);
 
+    // Getters
+    int getNumDocs() const;
+    int getNumTotalPal() const;
+    int getNumTotalPalSinParada() const;
+    int getNumTotalPalDiferentes() const;
+    int getTamBytes() const;
+
+    // Setters
+    void setNumDocs(int numDocs);
+    void setNumTotalPal(int numTotalPal);
+    void setNumTotalPalSinParada(int numTotalPalSinParada);
+    void setNumTotalPalDiferentes(int numTotalPalDiferentes);
+    void setTamBytes(int tamBytes);
+
 private:
     // Numero total de documentos en la coleccion
     int numDocs;
@@ -176,6 +219,14 @@ public:
     // Operador igual para asignar los mismos valores de una informacionTerminoPregunta a otra
     InformacionTerminoPregunta &operator=(const InformacionTerminoPregunta &);
 
+    // Getters
+    int getFt() const;
+    list<int> getPosTerm() const;
+
+    // Setters
+    void setFt(int ft);
+    void setPosTerm(int posTerm);
+
 private:
     // Frecuencia total del término en la pregunta
     int ft;
@@ -195,8 +246,18 @@ public:
     InformacionPregunta();
     // Destructor de informacionPregunta
     ~InformacionPregunta();
-    // Operador igual para asignar los mismos valores de una informacionPregunta a otra 
+    // Operador igual para asignar los mismos valores de una informacionPregunta a otra
     InformacionPregunta &operator=(const InformacionPregunta &);
+
+    // Getters y Setters
+    int getNumTotalPal() const;
+    int getNumTotalPalSinParada() const;
+    int getNumTotalPalDiferentes() const;
+
+    void setNumTotalPal(int numTotalPal);
+    void setNumTotalPalSinParada(int numTotalPalSinParada);
+    void setNumTotalPalDiferentes(int numTotalPalDiferentes);
+
 private:
     // Numero total de palabras en la pregunta
     int numTotalPal;

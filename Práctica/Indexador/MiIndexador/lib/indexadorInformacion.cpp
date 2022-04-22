@@ -61,14 +61,11 @@ bool Fecha::operator<(const Fecha &f) const
         return false;
 }
 
-
 // Operador mayor que para comparar dos fechas
 bool Fecha::operator>(const Fecha &f) const
 {
     return !(*this < f);
 }
-
-
 
 // Operador igual para asignar los mismos valores de una fecha a otra
 Fecha &Fecha::operator=(const Fecha &f)
@@ -114,6 +111,30 @@ InformacionTermino &InformacionTermino::operator=(const InformacionTermino &t)
     return (*this);
 }
 
+int InformacionTermino::getFtc() const
+{
+    return this->ftc;
+}
+void InformacionTermino::setFtc(int ftc)
+{
+    this->ftc = ftc;
+}
+
+void InformacionTermino::insertarDoc(int idDoc, InfTermDoc &infTermDoc)
+{
+    this->l_docs.insert({idDoc, infTermDoc});
+}
+
+InfTermDoc InformacionTermino::getInfTermDoc(int idDoc)
+{
+    return this->l_docs.find(idDoc)->second;
+}
+
+unordered_map<int, InfTermDoc> InformacionTermino::getL_docs() const
+{
+    return this->l_docs;
+}
+
 ostream &operator<<(ostream &os, const InformacionTermino &t)
 {
     os << "Frecuencia total: " << t.ftc << "\tfd: " << t.l_docs.size();
@@ -149,6 +170,26 @@ InfTermDoc &InfTermDoc::operator=(const InfTermDoc &t)
         this->posTerm = t.posTerm;
     }
     return (*this);
+}
+
+int InfTermDoc::getFt() const
+{
+    return this->ft;
+}
+
+list<int> InfTermDoc::getPosTerm() const
+{
+    return this->posTerm;
+}
+
+void InfTermDoc::setFt(int ft)
+{
+    this->ft = ft;
+}
+
+void InfTermDoc::setPosTerm(int posTerm)
+{
+    this->posTerm.push_back(posTerm);
 }
 
 ostream &operator<<(ostream &os, const InfTermDoc &t)
@@ -214,6 +255,66 @@ InfDoc &InfDoc::operator=(const InfDoc &d)
     return (*this);
 }
 
+int InfDoc::getIdDoc() const
+{
+    return this->idDoc;
+}
+
+int InfDoc::getNumPal() const
+{
+    return this->numPal;
+}
+
+int InfDoc::getNumPalSinParada() const
+{
+    return this->numPalSinParada;
+}
+
+int InfDoc::getNumPalDiferentes() const
+{
+    return this->numPalDiferentes;
+}
+
+int InfDoc::getTamBytes() const
+{
+    return this->tamBytes;
+}
+
+Fecha InfDoc::getFechaModificacion() const
+{
+    return this->fechaModificacion;
+}
+
+void InfDoc::setIdDoc(int idDoc)
+{
+    this->idDoc = idDoc;
+}
+
+void InfDoc::setNumPal(int numPal)
+{
+    this->numPal = numPal;
+}
+
+void InfDoc::setNumPalSinParada(int numPalSinParada)
+{
+    this->numPalSinParada = numPalSinParada;
+}
+
+void InfDoc::setNumPalDiferentes(int numPalDiferentes)
+{
+    this->numPalDiferentes = numPalDiferentes;
+}
+
+void InfDoc::setTamBytes(int tamBytes)
+{
+    this->tamBytes = tamBytes;
+}
+
+void InfDoc::setFechaModificacion(Fecha fechaModificacion)
+{
+    this->fechaModificacion = fechaModificacion;
+}
+
 ostream &operator<<(ostream &os, const InfDoc &d)
 {
     os << "idDoc: " << d.idDoc << "\tnumPal: " << d.numPal
@@ -265,6 +366,56 @@ InfColeccionDocs &InfColeccionDocs::operator=(const InfColeccionDocs &c)
     return (*this);
 }
 
+int InfColeccionDocs::getNumDocs() const
+{
+    return this->numDocs;
+}
+
+int InfColeccionDocs::getNumTotalPal() const
+{
+    return this->numTotalPal;
+}
+
+int InfColeccionDocs::getNumTotalPalSinParada() const
+{
+    return this->numTotalPalSinParada;
+}
+
+int InfColeccionDocs::getNumTotalPalDiferentes() const
+{
+    return this->numTotalPalDiferentes;
+}
+
+int InfColeccionDocs::getTamBytes() const
+{
+    return this->tamBytes;
+}
+
+void InfColeccionDocs::setNumDocs(int numDocs)
+{
+    this->numDocs = numDocs;
+}
+
+void InfColeccionDocs::setNumTotalPal(int numTotalPal)
+{
+    this->numTotalPal = numTotalPal;
+}
+
+void InfColeccionDocs::setNumTotalPalSinParada(int numTotalPalSinParada)
+{
+    this->numTotalPalSinParada = numTotalPalSinParada;
+}
+
+void InfColeccionDocs::setNumTotalPalDiferentes(int numTotalPalDiferentes)
+{
+    this->numTotalPalDiferentes = numTotalPalDiferentes;
+}
+
+void InfColeccionDocs::setTamBytes(int tamBytes)
+{
+    this->tamBytes = tamBytes;
+}
+
 ostream &operator<<(ostream &os, const InfColeccionDocs &c)
 {
     os << "numDocs: " << c.numDocs << "\tnumTotalPal: " << c.numTotalPal
@@ -299,6 +450,26 @@ InformacionTerminoPregunta &InformacionTerminoPregunta::operator=(const Informac
         this->posTerm = t.posTerm;
     }
     return (*this);
+}
+
+int InformacionTerminoPregunta::getFt() const
+{
+    return this->ft;
+}
+
+list<int> InformacionTerminoPregunta::getPosTerm() const
+{
+    return this->posTerm;
+}
+
+void InformacionTerminoPregunta::setFt(int ft)
+{
+    this->ft = ft;
+}
+
+void InformacionTerminoPregunta::setPosTerm(int posTerm)
+{
+    this->posTerm.push_back(posTerm);
 }
 
 ostream &operator<<(ostream &os, const InformacionTerminoPregunta &t)

@@ -119,7 +119,182 @@ IndexadorHash &IndexadorHash::operator=(const IndexadorHash &ind)
 
 bool IndexadorHash::Indexar(const string &ficheroDocumentos)
 {
-    
+    // Abrimos el fichero ficheroDocumentos
+    ifstream nombresDocumentos(ficheroDocumentos, ifstream::in);
+    // Informacion del documento que necesito para indexar
+    string documentoAnalizo, lineaAnalizo;
+    bool procederIndexacion;
+    struct stat infoDocumento;
+    int idDocumentoAuxiliar;
+    list<string> tokensLineaAnalizo;
+    int posTermino;
+
+    // Si se ha podido abrir bien el fichero y podido leer
+    if (nombresDocumentos.good())
+    {
+        ifstream documentoAnalizoFich;
+        documentoAnalizo.clear();
+        // Cojo el nonbre de un documento
+        while (getline(nombresDocumentos, documentoAnalizo))
+        {
+            auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
+            // Reinicio los valores que necesito
+            idDocumentoAuxiliar = 0;
+            procederIndexacion = false;
+            posTermino = 0;
+
+            // Saco la informacion del documento
+            stat(documentoAnalizo.c_str(), &infoDocumento);
+            // Obtengo la fecha de modificacion del documento y la parseo a mi propia estructura
+            Fecha fechaModificacionDoc(gmtime(&(infoDocumento.st_mtime)));
+
+            // Comprobamos que el fichero no esta en el indice
+            if (itIndiceDocumentos == indiceDocs.end())
+            {
+                // Como no hemos encontrado el fichero entonces lo indexamos
+                procederIndexacion = true;
+            }
+            else
+            {
+                cerr << "El documento " << documentoAnalizo << " ya esta en el indice"
+                     << "\n";
+                // Lo ha encontrado entonces deberemos comprobar si la fecha de modificacion es igual o menor que la que tenemos
+                if (itIndiceDocumentos->second.getFechaModificacion() < fechaModificacionDoc)
+                {
+                    cout << "El documento " << documentoAnalizo << " se va a reindexar"
+                         << "\n";
+                    // Nos guardamos el id del documento que tenemos en el indice para poder asignarlo nuevamente
+                    idDocumentoAuxiliar = itIndiceDocumentos->second.getIdDoc();
+                    procederIndexacion = true;
+                }
+                // Borramos el documento del indice para poder volver a indexarlo
+                if (!BorraDoc(documentoAnalizo))
+                {
+                    cerr << "No se ha podido borrar el documento " << documentoAnalizo << "\n";
+                    return false;
+                }
+            }
+
+            // Procedemos a la indexacion si lo necesitamos
+            if (procederIndexacion)
+            {
+                // Abrimos el documento que estamos analizando para leerlo
+                documentoAnalizoFich.open(documentoAnalizo, ifstream::in);
+
+                // Si no se ha podido abrir el documento
+                if (!documentoAnalizoFich.good())
+                {
+                    // Sacamos el error por pantalla si no se ha podido abrir el documento
+                    this->~IndexadorHash();
+                    cerr << "No se ha podido abrir el documento " << documentoAnalizo << "\n";
+                    return false;
+                }
+                else // Si si que se puede abrir
+                {
+                    InfDoc informacioDocumentoAnalizo;
+                    // Empezamos a meterle la informacion
+                    if (idDocumentoAuxiliar != 0)
+                    {
+                        informacioDocumentoAnalizo.setIdDoc(idDocumentoAuxiliar);
+                    }
+                    else
+                    {
+                        informacionColeccionDocs.setNumDocs(informacionColeccionDocs.getNumDocs() + 1);
+                        informacioDocumentoAnalizo.setIdDoc(informacionColeccionDocs.getNumDocs());
+                    }
+                    informacioDocumentoAnalizo.setTamBytes(infoDocumento.st_size);
+                    informacioDocumentoAnalizo.setFechaModificacion(fechaModificacionDoc);
+
+                    // Leemos la linea del documento
+                    while (getline(documentoAnalizoFich, lineaAnalizo))
+                    {
+                        // Sacamos los tokens de la linea
+                        tok.Tokenizar(lineaAnalizo, tokensLineaAnalizo);
+                        // Asignamos la cantidad de palabras que tiene el documento
+                        informacioDocumentoAnalizo.setNumPal(informacioDocumentoAnalizo.getNumPal() + tokensLineaAnalizo.size());
+
+                        // Para cada uno de los token que tenemos le pasamos el stemmer y sacamos su informacion
+                        for (auto itTokens = tokensLineaAnalizo.begin(); itTokens != tokensLineaAnalizo.end(); ++itTokens)
+                        {
+                            // Le pasamos el stemmer al token
+                            stemmerIndexador.stemmer((*itTokens), tipoStemmer);
+                            // Buscamos en nuestras stopWords para ver si tenemos que quitarla o no
+                            if (stopWords.find((*itTokens)) == stopWords.end())
+                            {
+                                // Incrementamos el numero de palabras sin parada
+                                informacioDocumentoAnalizo.setNumPalSinParada(informacioDocumentoAnalizo.getNumPalSinParada() + 1);
+
+                                // Comprobamos si el termino ya esta en el indice
+                                auto PalabrasIndice = indice.find((*itTokens));
+
+                                // Si el termino ya existe lo que vamos a hacer es cargar su informacion y modificarla
+                                if (PalabrasIndice != indice.end())
+                                {
+                                    // Cargamos la informacion del termino
+                                    auto informacionTerminoCargado = PalabrasIndice->second.getL_docs().find(informacioDocumentoAnalizo.getIdDoc());
+
+                                    // El termino existe ya en el documento por lo tanto actualizamos frencuencia y posicion
+                                    if (informacionTerminoCargado != PalabrasIndice->second.getL_docs().end())
+                                    {
+                                        informacionTerminoCargado->second.setFt(informacionTerminoCargado->second.getFt() + 1);
+                                        informacionTerminoCargado->second.setPosTerm(posTermino);
+                                    }
+                                    else // El termino no ha aparecido el documento hasta ahora por lo tanto lo anadimos
+                                    {
+                                        informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
+                                        InfTermDoc informacionTerminoDocumento;
+                                        informacionTerminoDocumento.setFt(1);
+                                        informacionTerminoDocumento.setPosTerm(posTermino);
+                                        PalabrasIndice->second.getL_docs().insert(pair<int, InfTermDoc>(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento));
+                                    }
+                                }
+                                else // Si el termino no existe lo que vamos a hacer es insertarlo
+                                {
+                                    // Incrementamos las palabras diferentes que tenemos en el documento
+                                    informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
+                                    // Incrementamos nuestra coleccion de palabras diferentes
+                                    informacionColeccionDocs.setNumTotalPalDiferentes(informacionColeccionDocs.getNumTotalPalDiferentes() + 1);
+
+                                    // Esta la informacion que tenemos del termino en general
+                                    InformacionTermino informacionTodosTerminos;
+                                    // Esta es la informacion del termino en el documento
+                                    InfTermDoc informacionTerminoEnDocumento;
+
+                                    // Le asignamos la informacion inicial al termino
+                                    informacionTerminoEnDocumento.setFt(1);
+                                    informacionTerminoEnDocumento.setPosTerm(posTermino);
+                                    // Inicializamos la informacion global del termino
+                                    informacionTodosTerminos.setFtc(1);
+                                    informacionTodosTerminos.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoEnDocumento);
+                                    // Insertamos el termino en el indice
+                                    indice.insert(pair<string, InformacionTermino>((*itTokens), informacionTodosTerminos));
+                                }
+                            }
+                            ++posTermino;
+                        }
+
+                        lineaAnalizo.clear();
+                    }
+                    // Ahora que tenemos todos los nuevos terminos y los documentos debemos actualizar nuestra coleccion
+                    informacionColeccionDocs.setNumTotalPal(informacionColeccionDocs.getNumTotalPal() + informacioDocumentoAnalizo.getNumPal());
+                    informacionColeccionDocs.setNumTotalPalSinParada(informacionColeccionDocs.getNumTotalPalSinParada() + informacioDocumentoAnalizo.getNumPalSinParada());
+                    informacionColeccionDocs.setNumTotalPalDiferentes(informacionColeccionDocs.getNumTotalPalDiferentes() + informacioDocumentoAnalizo.getNumPalDiferentes());
+                    // Insertamos el documento en la coleccion
+                    indiceDocs.insert({documentoAnalizo, informacioDocumentoAnalizo});
+                }
+            }
+        }
+
+        // Cerramos el documento con los nombres
+        nombresDocumentos.close();
+    }
+    else
+    {
+        cerr << "ERROR: no se ha podido abrir el archivo que contiene los nombres de los documentos: " << ficheroDocumentos << "\n";
+    }
+
+    // Si todo ha salido segun lo previsto :)
+    return true;
 }
 
 bool IndexadorHash::IndexarDirectorio(const string &dirAIndexar) {}

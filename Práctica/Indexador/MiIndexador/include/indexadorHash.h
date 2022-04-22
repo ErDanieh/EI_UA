@@ -147,6 +147,9 @@ public:
 
     bool ListarDocs(const string &nomDoc) const;
 
+    //Para cada uno de nuestros Indexadores tendremos nuestro objeto stemmer
+    stemmerPorter stemmerIndexador;
+
 private:
     /**
      * @brief Este constructor se pone en la parte privada porque no se permitirá
