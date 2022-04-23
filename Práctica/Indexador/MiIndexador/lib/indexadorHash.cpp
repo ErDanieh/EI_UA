@@ -34,6 +34,11 @@ IndexadorHash::IndexadorHash(const string &fichStopWords, const string &delimita
         }
         fichero.close();
     }
+    else
+    {
+        cerr << "No se ha encontrado el fichero con StopWords"
+             << "\n";
+    }
 
     // Inicializamos los valores que va a tener nuestro tokenizador
     this->tok.DelimitadoresPalabra(delimitadores);
@@ -57,7 +62,10 @@ IndexadorHash::IndexadorHash(const string &fichStopWords, const string &delimita
     }
 }
 
-IndexadorHash::IndexadorHash(const string &directorioIndexacion) {}
+IndexadorHash::IndexadorHash(const string &directorioIndexacion)
+{
+    RecuperarIndexacion(directorioIndexacion);
+}
 
 // Constrcutor de copia
 IndexadorHash::IndexadorHash(const IndexadorHash &ind)
@@ -137,7 +145,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
         // Cojo el nonbre de un documento
         while (getline(nombresDocumentos, documentoAnalizo))
         {
-            //cout << "Analizando documento : " << documentoAnalizo << endl;
+            // cout << "Analizando documento : " << documentoAnalizo << endl;
             auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
             // Reinicio los valores que necesito
             idDocumentoAuxiliar = 0;
@@ -152,8 +160,8 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
             // Comprobamos que el fichero no esta en el indice
             if (itIndiceDocumentos == indiceDocs.end())
             {
-                //cout << "El documento no esta en el indice" << endl;
-                // Como no hemos encontrado el fichero entonces lo indexamos
+                // cout << "El documento no esta en el indice" << endl;
+                //  Como no hemos encontrado el fichero entonces lo indexamos
                 procederIndexacion = true;
             }
             else
@@ -172,7 +180,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                 // Borramos el documento del indice para poder volver a indexarlo
                 if (!BorraDoc(documentoAnalizo))
                 {
-                    //cout << "No se ha podido borrar el documento del indice" << endl;
+                    // cout << "No se ha podido borrar el documento del indice" << endl;
                     cerr << "No se ha podido borrar el documento " << documentoAnalizo << "\n";
                     return false;
                 }
@@ -181,8 +189,8 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
             // Procedemos a la indexacion si lo necesitamos
             if (procederIndexacion)
             {
-                //cout << documentoAnalizo << endl;
-                // Abrimos el documento que estamos analizando para leerlo
+                // cout << documentoAnalizo << endl;
+                //  Abrimos el documento que estamos analizando para leerlo
                 documentoAnalizoFich.open(documentoAnalizo.c_str(), ifstream::in);
 
                 // Si no se ha podido abrir el documento
@@ -195,10 +203,10 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                 }
                 else // Si si que se puede abrir
                 {
-                    //cout << "he abierto el documento" << endl;
+                    // cout << "he abierto el documento" << endl;
 
                     InfDoc informacioDocumentoAnalizo;
-                    //cout << "Voy a insertar la informacion" << endl;
+                    // cout << "Voy a insertar la informacion" << endl;
 
                     // Empezamos a meterle la informacion
                     if (idDocumentoAuxiliar != 0)
@@ -213,13 +221,13 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     informacioDocumentoAnalizo.setTamBytes(infoDocumento.st_size);
                     informacioDocumentoAnalizo.setFechaModificacion(fechaModificacionDoc);
 
-                    //cout << "he asignado la informacion" << endl;
+                    // cout << "he asignado la informacion" << endl;
 
                     // Leemos la linea del documento
                     while (getline(documentoAnalizoFich, lineaAnalizo))
                     {
-                       //cout << lineaAnalizo << endl;
-                        // Sacamos los tokens de la linea
+                        // cout << lineaAnalizo << endl;
+                        //  Sacamos los tokens de la linea
                         tok.Tokenizar(lineaAnalizo, tokensLineaAnalizo);
                         // Asignamos la cantidad de palabras que tiene el documento
                         informacioDocumentoAnalizo.setNumPal(informacioDocumentoAnalizo.getNumPal() + tokensLineaAnalizo.size());
@@ -280,8 +288,8 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                     informacionTodosTerminos.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoEnDocumento);
                                     // Insertamos el termino en el indice
                                     indice.insert(pair<string, InformacionTermino>((*itTokens), informacionTodosTerminos));
-                                    //cout << informacionTodosTerminos << endl;
-                                    //cout << informacionTerminoEnDocumento << endl;
+                                    // cout << informacionTodosTerminos << endl;
+                                    // cout << informacionTerminoEnDocumento << endl;
                                 }
                             }
                             ++posTermino;
@@ -289,18 +297,18 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
 
                         lineaAnalizo.clear();
                     }
-                    //cout << "he analizado bien" << endl;
-                    // Ahora que tenemos todos los nuevos terminos y los documentos debemos actualizar nuestra coleccion
+                    // cout << "he analizado bien" << endl;
+                    //  Ahora que tenemos todos los nuevos terminos y los documentos debemos actualizar nuestra coleccion
                     informacionColeccionDocs.setNumTotalPal(informacionColeccionDocs.getNumTotalPal() + informacioDocumentoAnalizo.getNumPal());
                     informacionColeccionDocs.setNumTotalPalSinParada(informacionColeccionDocs.getNumTotalPalSinParada() + informacioDocumentoAnalizo.getNumPalSinParada());
                     informacionColeccionDocs.setNumTotalPalDiferentes(informacionColeccionDocs.getNumTotalPalDiferentes() + informacioDocumentoAnalizo.getNumPalDiferentes());
-                    //cout << "he seteado el total de palabras" << endl;
+                    // cout << "he seteado el total de palabras" << endl;
 
                     // Insertamos el documento en la coleccion
-                    //cout << documentoAnalizo << endl;
-                    //cout << informacioDocumentoAnalizo << endl;
+                    // cout << documentoAnalizo << endl;
+                    // cout << informacioDocumentoAnalizo << endl;
                     this->indiceDocs.insert({documentoAnalizo, informacioDocumentoAnalizo});
-                    //cout << "todo de locos " << endl;
+                    // cout << "todo de locos " << endl;
                     documentoAnalizoFich.close();
                 }
             }
@@ -318,9 +326,77 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
     return true;
 }
 
-bool IndexadorHash::IndexarDirectorio(const string &dirAIndexar) {}
+bool IndexadorHash::IndexarDirectorio(const string &dirAIndexar)
+{
+    struct stat dir;
+    int err = stat(dirAIndexar.c_str(), &dir);
 
-bool IndexadorHash::GuardarIndexacion() const {}
+    if (err == -1 || !S_ISDIR(dir.st_mode))
+    {
+        return false;
+    }
+    else
+    {
+        // Le decimos al directorio que no coja los archivos con extension .tk por si acaso
+        string cmd = "find " + dirAIndexar + " -follow -type f -not -name \"*.tk\" | sort > lista_fich_indexar";
+        system(cmd.c_str());
+        return Indexar("lista_fich_indexar");
+    }
+}
+
+bool IndexadorHash::GuardarIndexacion() const
+{
+    // Obtenemos la informacion del directorio
+    struct stat infoDirectorio;
+    stat(this->directorioIndice.c_str(), &infoDirectorio);
+
+    // En el caso de que no exista el directorio tendremos que crearlo
+    if (!S_ISDIR(infoDirectorio.st_mode))
+    {
+        system(string("mkdir " + this->directorioIndice).c_str());
+    }
+
+    ofstream ficheroCreado(this->directorioIndice + "/" + "indice", ofstream::out);
+
+    if (!ficheroCreado.good())
+    {
+        cerr << "ERROR: no se ha podido crear el archivo de indice: " << this->directorioIndice << "/"
+             << "indice" << endl;
+        return false;
+    }
+    else
+    {
+        ficheroCreado << this->almacenarPosTerm << "\n";
+        ficheroCreado << this->almacenarEnDisco << "\n";
+        ficheroCreado << this->ficheroStopWords << "\n";
+        // Escribimos todas las stopWords en el fichero
+        for (auto it = this->stopWords.begin(); it != this->stopWords.end(); ++it)
+        {
+            ficheroCreado << *it << " ";
+        }
+        ficheroCreado << "\n";
+
+        // Escribimos toda la informacion de la pregunta
+        ficheroCreado << this->infPregunta.getNumTotalPal() << "\n";
+        ficheroCreado << this->infPregunta.getNumTotalPalDiferentes() << "\n";
+        ficheroCreado << this->infPregunta.getNumTotalPalSinParada() << "\n";
+        ficheroCreado << this->pregunta << "\n";
+        ficheroCreado << indicePregunta.size() << "\n";
+        // Escribimos la informacion de todos los terminos de la pregunta
+        for (auto it = indicePregunta.begin(); it != indicePregunta.end(); ++it)
+        {
+            ficheroCreado << it->first << "\n";
+            ficheroCreado << it->second.getFt() << "\n";
+            for(auto itTerm = it->second.getPosTerm().begin(); itTerm != it->second.getPosTerm().end(); ++itTerm)
+            {
+                ficheroCreado << (*itTerm) << " ";
+            }
+            //El intro nos indica que pasamos al siguiente termino
+            ficheroCreado << "\n";
+        }
+        //ME HE QUEDADO LINEA 327
+    }
+}
 
 bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion) {}
 
