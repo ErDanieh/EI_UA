@@ -7,10 +7,8 @@
 #include <unordered_map>
 #include <list>
 
-
 #include <tr1/unordered_map>
 #include <tr1/unordered_set>
-
 
 using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,12 +92,6 @@ private:
  */
 class Fecha
 {
-    int dia;
-    int mes;
-    int anyo;
-    int hora;
-    int min;
-    int seg;
 
 public:
     Fecha();
@@ -108,6 +100,12 @@ public:
     bool operator<(const Fecha &f) const;
     bool operator>(const Fecha &f) const;
     Fecha &operator=(const Fecha &f);
+    int dia;
+    int mes;
+    int anyo;
+    int hora;
+    int min;
+    int seg;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

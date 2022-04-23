@@ -20,7 +20,7 @@
 MAKE1=makefile
 
 # Fichero que contiene el main en el makefile
-MAIN=indexador.cpp
+MAIN=main.cpp
 # Nombre del ejecutable en el makefile
 EJE=indexador
 #################################################

@@ -414,11 +414,12 @@ void InfColeccionDocs::setTamBytes(int tamBytes)
     this->tamBytes = tamBytes;
 }
 
-ostream &operator<<(ostream &os, const InfColeccionDocs &c)
+ostream &operator<<(ostream &os, const InfColeccionDocs &p)
 {
-    os << "numDocs: " << c.numDocs << "\tnumTotalPal: " << c.numTotalPal
-       << "\tnumTotalSinParada: " << c.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << c.numTotalPalDiferentes << "\ttamBytes: " << c.tamBytes;
-    return os;
+	os << "numDocs: " << p.numDocs << "\tnumTotalPal: " << p.numTotalPal <<"\tnumTotalPalSinParada: " <<
+			p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes << "\ttamBytes: " <<
+			p.tamBytes;
+	return os;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -514,6 +515,36 @@ InformacionPregunta &InformacionPregunta::operator=(const InformacionPregunta &p
         this->numTotalPalDiferentes = p.numTotalPalDiferentes;
     }
     return (*this);
+}
+
+int InformacionPregunta::getNumTotalPal() const
+{
+    return this->numTotalPal;
+}
+
+int InformacionPregunta::getNumTotalPalSinParada() const
+{
+    return this->numTotalPalSinParada;
+}
+
+int InformacionPregunta::getNumTotalPalDiferentes() const
+{
+    return this->numTotalPalDiferentes;
+}
+
+void InformacionPregunta::setNumTotalPal(int numTotalPal)
+{
+    this->numTotalPal = numTotalPal;
+}
+
+void InformacionPregunta::setNumTotalPalSinParada(int numTotalPalSinParada)
+{
+    this->numTotalPalSinParada = numTotalPalSinParada;
+}
+
+void InformacionPregunta::setNumTotalPalDiferentes(int numTotalPalDiferentes)
+{
+    this->numTotalPalDiferentes = numTotalPalDiferentes;
 }
 
 // Operador salida

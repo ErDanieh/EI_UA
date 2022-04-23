@@ -215,7 +215,7 @@ void Tokenizador::CasosEspeciales(const bool &nuevoCasosEspeciales)
         this->casosEspeciales = nuevoCasosEspeciales;
 }
 
-bool Tokenizador::CasosEspeciales()
+bool Tokenizador::CasosEspeciales() const
 {
     return this->casosEspeciales;
 }
@@ -225,7 +225,7 @@ void Tokenizador::PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos
     this->pasarAminuscSinAcentos = nuevoPasarAminuscSinAcentos;
 }
 
-bool Tokenizador::PasarAminuscSinAcentos()
+bool Tokenizador::PasarAminuscSinAcentos() const
 {
     return this->pasarAminuscSinAcentos;
 }

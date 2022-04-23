@@ -287,7 +287,7 @@ public:
      * @return true
      * @return false
      */
-    bool CasosEspeciales();
+    bool CasosEspeciales() const;
 
     /**
      * @brief Cambia la variable privada ?pasarAminuscSinAcentos?. Atenci�n al
@@ -302,7 +302,7 @@ public:
      * @return true
      * @return false
      */
-    bool PasarAminuscSinAcentos();
+    bool PasarAminuscSinAcentos() const;
 
     /**
      * @brief La lista de tokens ser� creada a partir de los casos especiales que se defienen

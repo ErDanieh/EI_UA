@@ -3,13 +3,13 @@
 
 ostream &operator<<(ostream &s, const IndexadorHash &p)
 {
-    s << "Fichero con el listado de palabras de parada : " << p.ficheroStopWords << "\n";
-    s << "Tokenizador : " << p.tok << "\n";
-    s << "Directorio donde se almacenara el indice generado : " << p.directorioIndice << "\n";
-    s << "Stemmer utilizado : " << p.tipoStemmer << "\n";
-    s << "Informacion de la coleccion indexada : " << p.informacionColeccionDocs << "\n";
-    s << "Se almacenara parte del indice en disco duro : " << p.almacenarEnDisco << "\n";
-    s << "Se almacenaran las posiciones de los terminos : " << p.almacenarPosTerm;
+    s << "Fichero con el listado de palabras de parada: " << p.ficheroStopWords << "\n";
+    s << "Tokenizador: " << p.tok << "\n";
+    s << "Directorio donde se almacenara el indice generado: " << p.directorioIndice << "\n";
+    s << "Stemmer utilizado: " << p.tipoStemmer << "\n";
+    s << "Informacion de la coleccion indexada: " << p.informacionColeccionDocs << "\n";
+    s << "Se almacenara parte del indice en disco duro: " << p.almacenarEnDisco << "\n";
+    s << "Se almacenaran las posiciones de los terminos: " << p.almacenarPosTerm << "\n";
     return s;
 }
 
@@ -145,7 +145,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
         // Cojo el nonbre de un documento
         while (getline(nombresDocumentos, documentoAnalizo))
         {
-            // cout << "Analizando documento : " << documentoAnalizo << endl;
+            //cout << "Analizando documento : " << documentoAnalizo << endl;
             auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
             // Reinicio los valores que necesito
             idDocumentoAuxiliar = 0;
@@ -245,31 +245,37 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
 
                                 // Comprobamos si el termino ya esta en el indice
                                 auto PalabrasIndice = indice.find((*itTokens));
+                                //cout << "Palabra: " << (*itTokens);
 
                                 // Si el termino ya existe lo que vamos a hacer es cargar su informacion y modificarla
                                 if (PalabrasIndice != indice.end())
                                 {
+                                    //cout << " Ya existe en el indice" << endl;
                                     // Cargamos la informacion del termino
                                     auto informacionTerminoCargado = PalabrasIndice->second.getL_docs().find(informacioDocumentoAnalizo.getIdDoc());
 
                                     // El termino existe ya en el documento por lo tanto actualizamos frencuencia y posicion
                                     if (informacionTerminoCargado != PalabrasIndice->second.getL_docs().end())
                                     {
+                                        //cout << "Ya existe en el documento" << endl;
                                         informacionTerminoCargado->second.setFt(informacionTerminoCargado->second.getFt() + 1);
                                         informacionTerminoCargado->second.setPosTerm(posTermino);
                                     }
                                     else // El termino no ha aparecido el documento hasta ahora por lo tanto lo anadimos
                                     {
+                                        //cout << "No existe en el documento" << endl;
                                         informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
                                         InfTermDoc informacionTerminoDocumento;
                                         informacionTerminoDocumento.setFt(1);
                                         informacionTerminoDocumento.setPosTerm(posTermino);
-                                        PalabrasIndice->second.getL_docs().insert(pair<int, InfTermDoc>(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento));
+                                        PalabrasIndice->second.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento);
+                                        //PalabrasIndice->second.getL_docs().insert(pair<int, InfTermDoc>(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento));
                                     }
                                     PalabrasIndice->second.setFtc(PalabrasIndice->second.getFtc() + 1);
                                 }
                                 else // Si el termino no existe lo que vamos a hacer es insertarlo
                                 {
+                                    //cout << " No existe en el indice" << endl;
                                     // Incrementamos las palabras diferentes que tenemos en el documento
                                     informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
                                     // Incrementamos nuestra coleccion de palabras diferentes
@@ -291,7 +297,9 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                     // cout << informacionTodosTerminos << endl;
                                     // cout << informacionTerminoEnDocumento << endl;
                                 }
+                                
                             }
+
                             ++posTermino;
                         }
 
@@ -301,14 +309,13 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     //  Ahora que tenemos todos los nuevos terminos y los documentos debemos actualizar nuestra coleccion
                     informacionColeccionDocs.setNumTotalPal(informacionColeccionDocs.getNumTotalPal() + informacioDocumentoAnalizo.getNumPal());
                     informacionColeccionDocs.setNumTotalPalSinParada(informacionColeccionDocs.getNumTotalPalSinParada() + informacioDocumentoAnalizo.getNumPalSinParada());
-                    informacionColeccionDocs.setNumTotalPalDiferentes(informacionColeccionDocs.getNumTotalPalDiferentes() + informacioDocumentoAnalizo.getNumPalDiferentes());
+                    informacionColeccionDocs.setTamBytes(informacionColeccionDocs.getTamBytes() + informacioDocumentoAnalizo.getTamBytes());
                     // cout << "he seteado el total de palabras" << endl;
 
                     // Insertamos el documento en la coleccion
                     // cout << documentoAnalizo << endl;
                     // cout << informacioDocumentoAnalizo << endl;
                     this->indiceDocs.insert({documentoAnalizo, informacioDocumentoAnalizo});
-                    // cout << "todo de locos " << endl;
                     documentoAnalizoFich.close();
                 }
             }
@@ -349,6 +356,7 @@ bool IndexadorHash::GuardarIndexacion() const
     // Obtenemos la informacion del directorio
     struct stat infoDirectorio;
     stat(this->directorioIndice.c_str(), &infoDirectorio);
+    Fecha fechaFile;
 
     // En el caso de que no exista el directorio tendremos que crearlo
     if (!S_ISDIR(infoDirectorio.st_mode))
@@ -387,14 +395,70 @@ bool IndexadorHash::GuardarIndexacion() const
         {
             ficheroCreado << it->first << "\n";
             ficheroCreado << it->second.getFt() << "\n";
-            for(auto itTerm = it->second.getPosTerm().begin(); itTerm != it->second.getPosTerm().end(); ++itTerm)
+            for (auto itTerm = it->second.getPosTerm().begin(); itTerm != it->second.getPosTerm().end(); ++itTerm)
             {
                 ficheroCreado << (*itTerm) << " ";
             }
-            //El intro nos indica que pasamos al siguiente termino
+            // El intro nos indica que pasamos al siguiente termino
             ficheroCreado << "\n";
         }
-        //ME HE QUEDADO LINEA 327
+
+        // Informacion de la coleccion de documentos
+        ficheroCreado << this->informacionColeccionDocs.getNumDocs() << "\n";
+        ficheroCreado << this->informacionColeccionDocs.getNumTotalPal() << "\n";
+        ficheroCreado << this->informacionColeccionDocs.getNumTotalPalDiferentes() << "\n";
+        ficheroCreado << this->informacionColeccionDocs.getNumTotalPalSinParada() << "\n";
+        ficheroCreado << this->informacionColeccionDocs.getTamBytes() << "\n";
+
+        // Metemos el tamanyo del indice
+        ficheroCreado << this->indice.size() << "\n";
+        // Escribimos todos los terminos del indice
+        for (auto it = indice.begin(); it != indice.end(); ++it)
+        {
+            ficheroCreado << it->first << "\n";
+            ficheroCreado << it->second.getFtc() << "\n";
+            ficheroCreado << it->second.getL_docs().size() << "\n";
+
+            for (auto itTerm = it->second.getL_docs().begin(); itTerm != it->second.getL_docs().end(); ++itTerm)
+            {
+                ficheroCreado << itTerm->first << "\n";
+                ficheroCreado << itTerm->second.getFt() << "\n";
+
+                for (auto itTermPos = itTerm->second.getPosTerm().begin(); itTermPos != itTerm->second.getPosTerm().end(); ++itTermPos)
+                {
+                    ficheroCreado << (*itTermPos) << " ";
+                }
+                ficheroCreado << "\n";
+            }
+            // El intro nos indica que pasamos al siguiente termino
+            ficheroCreado << "\n";
+        }
+
+        // Escribimos todo nuestro indice de documentos
+        ficheroCreado << this->indiceDocs.size() << "\n";
+        for (auto it = indiceDocs.begin(); it != indiceDocs.end(); ++it)
+        {
+            ficheroCreado << it->first << "\n";
+            ficheroCreado << it->second.getIdDoc() << "\n";
+            ficheroCreado << it->second.getNumPal() << "\n";
+            ficheroCreado << it->second.getNumPalDiferentes() << "\n";
+            ficheroCreado << it->second.getNumPalSinParada() << "\n";
+            ficheroCreado << it->second.getTamBytes() << "\n";
+
+            fechaFile = it->second.getFechaModificacion();
+            ficheroCreado << fechaFile.anyo << "\n";
+            ficheroCreado << fechaFile.mes << "\n";
+            ficheroCreado << fechaFile.dia << "\n";
+            ficheroCreado << fechaFile.hora << "\n";
+            ficheroCreado << fechaFile.min << "\n";
+            ficheroCreado << fechaFile.seg << "\n";
+        }
+        ficheroCreado << this->tok.CasosEspeciales() << "\n";
+        ficheroCreado << this->tok.PasarAminuscSinAcentos() << "\n";
+        ficheroCreado << this->tok.DelimitadoresPalabra() << "\n";
+
+        ficheroCreado.close();
+        return true;
     }
 }
 
@@ -473,11 +537,21 @@ bool IndexadorHash::Actualiza(const string &word, const InformacionTermino &inf)
 
 bool IndexadorHash::Inserta(const string &word, const InformacionTermino &inf) {}
 
-int IndexadorHash::NumPalIndexadas() const {}
+int IndexadorHash::NumPalIndexadas() const
+{
+    return this->indice.size();
+}
 
-string IndexadorHash::DevolverFichPalParada() const {}
+string IndexadorHash::DevolverFichPalParada() const
+{
+    return this->ficheroStopWords;
+}
 
-void IndexadorHash::ListarPalParada() const {}
+void IndexadorHash::ListarPalParada() const
+{
+    for (auto it = stopWords.begin(); it != stopWords.end(); ++it)
+        cout << (*it) << "\n";
+}
 
 int IndexadorHash::NumPalParada() const
 {
@@ -524,10 +598,28 @@ void IndexadorHash::ListarInfColeccDocs() const
     cout << informacionColeccionDocs << "\n";
 }
 
-void IndexadorHash::ListarTerminos() const {}
+void IndexadorHash::ListarTerminos() const
+{
+    for (auto it = indice.begin(); it != indice.end(); ++it)
+        cout << it->first << '\t' << it->second << "\n";
+}
 
 bool IndexadorHash::ListarTerminos(const string &nomDoc) const {}
 
-void IndexadorHash::ListarDocs() const {}
+void IndexadorHash::ListarDocs() const
+{
+    for (auto it = indiceDocs.begin(); it != indiceDocs.end(); ++it)
+        cout << it->first << '\t' << it->second << endl;
+}
 
-bool IndexadorHash::ListarDocs(const string &nomDoc) const {}
+bool IndexadorHash::ListarDocs(const string &nomDoc) const
+{
+    auto itIndiceDocs = indiceDocs.find(nomDoc);
+
+    if (itIndiceDocs != indiceDocs.end())
+    {
+        cout << itIndiceDocs->first << '\t' << itIndiceDocs->second << "\n";
+        return true;
+    }
+    return false;
+}
