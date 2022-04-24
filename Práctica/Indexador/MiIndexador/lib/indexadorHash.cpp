@@ -145,7 +145,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
         // Cojo el nonbre de un documento
         while (getline(nombresDocumentos, documentoAnalizo))
         {
-            //cout << "Analizando documento : " << documentoAnalizo << endl;
+            // cout << "Analizando documento : " << documentoAnalizo << endl;
             auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
             // Reinicio los valores que necesito
             idDocumentoAuxiliar = 0;
@@ -245,38 +245,39 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
 
                                 // Comprobamos si el termino ya esta en el indice
                                 auto PalabrasIndice = indice.find((*itTokens));
-                                //cout << "Palabra: " << (*itTokens);
+                                // cout << "Palabra: " << (*itTokens);
 
                                 // Si el termino ya existe lo que vamos a hacer es cargar su informacion y modificarla
                                 if (PalabrasIndice != indice.end())
                                 {
-                                    //cout << " Ya existe en el indice" << endl;
-                                    // Cargamos la informacion del termino
+                                    // cout << " Ya existe en el indice" << endl;
+                                    //  Cargamos la informacion del termino
                                     auto informacionTerminoCargado = PalabrasIndice->second.getL_docs().find(informacioDocumentoAnalizo.getIdDoc());
+                                    //cout << informacionTerminoCargado->second;
 
                                     // El termino existe ya en el documento por lo tanto actualizamos frencuencia y posicion
                                     if (informacionTerminoCargado != PalabrasIndice->second.getL_docs().end())
                                     {
-                                        //cout << "Ya existe en el documento" << endl;
+                                        // cout << "Ya existe en el documento" << endl;
                                         informacionTerminoCargado->second.setFt(informacionTerminoCargado->second.getFt() + 1);
                                         informacionTerminoCargado->second.setPosTerm(posTermino);
                                     }
                                     else // El termino no ha aparecido el documento hasta ahora por lo tanto lo anadimos
                                     {
-                                        //cout << "No existe en el documento" << endl;
+                                        // cout << "No existe en el documento" << endl;
                                         informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
                                         InfTermDoc informacionTerminoDocumento;
                                         informacionTerminoDocumento.setFt(1);
                                         informacionTerminoDocumento.setPosTerm(posTermino);
                                         PalabrasIndice->second.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento);
-                                        //PalabrasIndice->second.getL_docs().insert(pair<int, InfTermDoc>(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento));
+                                        // PalabrasIndice->second.getL_docs().insert(pair<int, InfTermDoc>(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento));
                                     }
                                     PalabrasIndice->second.setFtc(PalabrasIndice->second.getFtc() + 1);
                                 }
                                 else // Si el termino no existe lo que vamos a hacer es insertarlo
                                 {
-                                    //cout << " No existe en el indice" << endl;
-                                    // Incrementamos las palabras diferentes que tenemos en el documento
+                                    // cout << " No existe en el indice" << endl;
+                                    //  Incrementamos las palabras diferentes que tenemos en el documento
                                     informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
                                     // Incrementamos nuestra coleccion de palabras diferentes
                                     informacionColeccionDocs.setNumTotalPalDiferentes(informacionColeccionDocs.getNumTotalPalDiferentes() + 1);
@@ -297,7 +298,6 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                     // cout << informacionTodosTerminos << endl;
                                     // cout << informacionTerminoEnDocumento << endl;
                                 }
-                                
                             }
 
                             ++posTermino;
@@ -462,9 +462,22 @@ bool IndexadorHash::GuardarIndexacion() const
     }
 }
 
-bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion) {}
+bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
+{
+    // TODO
+}
 
-void IndexadorHash::ImprimirIndexacion() const {}
+void IndexadorHash::ImprimirIndexacion() const
+{
+    cout << "Terminos indexados: "
+         << "\n";
+    for (auto it = indiceDocs.begin(); it != indiceDocs.end(); ++it) // A continuación aparecerá un listado del contenido del campo privado “indiceDocs” donde para cada documento indexado se imprimirá: cout << nomDoc << ‘\t’ << InfDoc << endl;
+        cout << it->first << '\t' << it->second << "\n";
+    cout << "Documentos indexados: "
+         << "\n";
+    for (auto it = indice.begin(); it != indice.end(); ++it) // A continuación aparecerá un listado del contenido del campo privado “índice” donde para cada término indexado se imprimirá: cout << termino << ‘\t’ << InformacionTermino << endl;
+        cout << it->first << '\t' << it->second << "\n";
+}
 
 bool IndexadorHash::IndexarPregunta(const string &preg) {}
 
@@ -505,7 +518,14 @@ bool IndexadorHash::DevuelvePregunta(InformacionPregunta &inf) const
         return false;
 }
 
-void IndexadorHash::ImprimirIndexacionPregunta() const {}
+void IndexadorHash::ImprimirIndexacionPregunta() const
+{
+    cout << "Pregunta indexada: " << pregunta << "\n";
+    cout << "Terminos indexados en la pregunta: "; // << "\n";
+    for (auto it = indicePregunta.begin(); it != indicePregunta.end(); ++it)
+        cout << it->first << '\t' << it->second << "\n";
+    cout << "Informacion de la pregunta: " << infPregunta << "\n";
+}
 
 void IndexadorHash::ImprimirPregunta()
 {
@@ -513,9 +533,39 @@ void IndexadorHash::ImprimirPregunta()
     cout << "Informacion de la pregunta : " << this->infPregunta << "\n";
 }
 
-bool IndexadorHash::Devuelve(const string &word, InformacionTermino &inf) const {}
+bool IndexadorHash::Devuelve(const string &word, InformacionTermino &inf) const
+{
+    auto temp = indice.find(word);
+    if (temp != indice.end())
+    {
+        inf = temp->second;
+        return true;
+    }
+    inf = InformacionTermino();
+    return false;
+}
 
-bool IndexadorHash::Devuelve(const string &word, const string &nomDoc, InfTermDoc &InfDoc) const {}
+bool IndexadorHash::Devuelve(const string &word, const string &nomDoc, InfTermDoc &InfDoc) const
+{
+    auto itDocumentos = indiceDocs.find(nomDoc);
+
+    if (itDocumentos != indiceDocs.end())
+    {
+        auto itIndice = indice.find(word);
+        if (itIndice != indice.end())
+        {
+            long int idDoc = itDocumentos->second.getIdDoc();
+            auto itLdocs = itIndice->second.getL_docs().find(idDoc);
+
+            if (itLdocs != itIndice->second.getL_docs().end())
+            {
+                InfDoc = itLdocs->second;
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 bool IndexadorHash::Existe(const string &word) const
 {
@@ -529,11 +579,29 @@ bool IndexadorHash::Borra(const string &word)
 
 bool IndexadorHash::BorraDoc(const string &nomDoc) {}
 
-void IndexadorHash::VaciarIndiceDocs() {}
+void IndexadorHash::VaciarIndiceDocs()
+{
+    indiceDocs.clear();
+}
 
-void IndexadorHash::VaciarIndicePreg() {}
+void IndexadorHash::VaciarIndicePreg()
+{
+    indicePregunta.clear();
+}
 
-bool IndexadorHash::Actualiza(const string &word, const InformacionTermino &inf) {}
+bool IndexadorHash::Actualiza(const string &word, const InformacionTermino &inf)
+{
+    if (Existe(word))
+    {
+        indice[word] = inf;
+        return true;
+    }
+    else
+    {
+        cerr << "ERROR: En actualiza no existe la palabra " << word << endl;
+        return false;
+    }
+}
 
 bool IndexadorHash::Inserta(const string &word, const InformacionTermino &inf) {}
 

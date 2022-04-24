@@ -77,6 +77,15 @@ public:
     void insertarDoc(int idDoc, InfTermDoc &infTermDoc);
     InfTermDoc getInfTermDoc(int idDoc);
     unordered_map<int, InfTermDoc> getL_docs() const;
+    void setL_docs(unordered_map<int, InfTermDoc> l_docs)
+    {
+        this->l_docs = l_docs;
+    };
+    void modificarDoc(int idDoc, int ft, int posTerm){
+        l_docs[idDoc].setFt(ft);
+        l_docs[idDoc].setPosTerm(posTerm);
+    };
+
 
 private:
     // Frecuencia total del termino en la coleccion
