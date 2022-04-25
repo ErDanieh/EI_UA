@@ -36,6 +36,10 @@ public:
     // Setters
     void setFt(int ft);
     void setPosTerm(int posTerm);
+    void sustituirPosTerm(list<int> posNueva)
+    {
+        posTerm = posNueva;
+    };
 
 private:
     // Frecuencia del termino en el documento
@@ -73,19 +77,36 @@ public:
 
     // Getters y setters
     int getFtc() const;
+
     void setFtc(int ftc);
+
+    // Inserta un nuevo documento en la tabla hash segun su id
     void insertarDoc(int idDoc, InfTermDoc &infTermDoc);
+
+    // Devuelve la informacion del documento pasado como parametro
     InfTermDoc getInfTermDoc(int idDoc);
+
+    // Devuelve la informacion de los termnos en el documento
     unordered_map<int, InfTermDoc> getL_docs() const;
+
     void setL_docs(unordered_map<int, InfTermDoc> l_docs)
     {
         this->l_docs = l_docs;
     };
-    void modificarDoc(int idDoc, int ft, int posTerm){
-        l_docs[idDoc].setFt(ft);
-        l_docs[idDoc].setPosTerm(posTerm);
+    void modificarDoc(int idDoc, int ft, int posTerm)
+    {
+        l_docs.find(idDoc)->second.setFt(ft);
+        l_docs.find(idDoc)->second.setPosTerm(posTerm);
+    };
+    void imprimirL_docs()
+    {
+        for (auto it = l_docs.begin(); it != l_docs.end(); ++it)
+        {
+            cout << it->second;
+        }
     };
 
+    
 
 private:
     // Frecuencia total del termino en la coleccion

@@ -175,6 +175,7 @@ private:
     // Información recogida de la pregunta indexada. Se almacenará en memoria principal
     InformacionPregunta infPregunta;
 
+    //Tabla hash con todas las stopWords
     tr1::unordered_set<string> stopWords;
 
     // Nombre del fichero que contiene las palabras de parada

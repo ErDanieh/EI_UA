@@ -120,10 +120,12 @@ void InformacionTermino::setFtc(int ftc)
     this->ftc = ftc;
 }
 
+
 void InformacionTermino::insertarDoc(int idDoc, InfTermDoc &infTermDoc)
 {
-    this->l_docs.insert({idDoc, infTermDoc});
+    l_docs.insert({idDoc, infTermDoc});
 }
+
 
 InfTermDoc InformacionTermino::getInfTermDoc(int idDoc)
 {
@@ -166,6 +168,7 @@ InfTermDoc &InfTermDoc::operator=(const InfTermDoc &t)
 {
     if (this != &t)
     {
+        this->~InfTermDoc();
         this->ft = t.ft;
         this->posTerm = t.posTerm;
     }
@@ -416,10 +419,8 @@ void InfColeccionDocs::setTamBytes(int tamBytes)
 
 ostream &operator<<(ostream &os, const InfColeccionDocs &p)
 {
-	os << "numDocs: " << p.numDocs << "\tnumTotalPal: " << p.numTotalPal <<"\tnumTotalPalSinParada: " <<
-			p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes << "\ttamBytes: " <<
-			p.tamBytes;
-	return os;
+    os << "numDocs: " << p.numDocs << "\tnumTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: " << p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes << "\ttamBytes: " << p.tamBytes;
+    return os;
 }
 
 ////////////////////////////////////////////////////////////////////////////
