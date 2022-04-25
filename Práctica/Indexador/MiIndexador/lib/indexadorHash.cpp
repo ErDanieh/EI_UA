@@ -145,7 +145,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
         // Cojo el nonbre de un documento
         while (getline(nombresDocumentos, documentoAnalizo))
         {
-            //cout << "Analizando documento : " << documentoAnalizo << "\n";
+            // cout << "Analizando documento : " << documentoAnalizo << "\n";
             auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
             // Reinicio los valores que necesito
             idDocumentoAuxiliar = 0;
@@ -466,7 +466,167 @@ bool IndexadorHash::GuardarIndexacion() const
 
 bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
 {
-    // TODO
+    indice.clear();
+    indiceDocs.clear();
+    indicePregunta.clear();
+    pregunta = "";
+    ficheroStopWords = "";
+    directorioIndice = "";
+    tipoStemmer = 0;
+    almacenarEnDisco = false;
+    almacenarPosTerm = false;
+
+    ifstream fichero(directorioIndexacion + "/indice", ifstream::in);
+    directorioIndice = directorioIndexacion;
+    Tokenizador tokAux(" ", false, false);
+    list<string> palabras;
+
+    if (fichero.is_open())
+    {
+        string dato = "";
+
+        getline(fichero, dato);
+        almacenarPosTerm = atoi(dato.c_str());
+
+        getline(fichero, dato);
+        almacenarEnDisco = atoi(dato.c_str());
+
+        getline(fichero, ficheroStopWords);
+
+        // Cogemos todas las stopWords separadas por espacios y nos las guardamos
+        getline(fichero, dato);
+        list<string> listaStopWords;
+        tokAux.Tokenizar(dato, listaStopWords);
+        for (auto it = listaStopWords.begin(); it != listaStopWords.end(); ++it)
+        {
+            stopWords.insert(*it);
+        }
+
+        getline(fichero, dato);
+        infPregunta.setNumTotalPal(atoi(dato.c_str()));
+
+        getline(fichero, dato);
+        infPregunta.setNumTotalPalDiferentes(atoi(dato.c_str()));
+
+        getline(fichero, dato);
+        infPregunta.setNumTotalPalSinParada(atoi(dato.c_str()));
+
+        getline(fichero, pregunta);
+
+        getline(fichero, dato);
+        for (unsigned i = atoi(dato.c_str()); i > 0; i--)
+        {
+            string termino;
+            InformacionTerminoPregunta infTermPreg;
+            getline(fichero, termino);
+
+            getline(fichero, dato);
+            infTermPreg.setFt(atoi(dato.c_str()));
+            getline(fichero, dato);
+
+            // Metemos todas las posiciones de la palabra
+            tokAux.Tokenizar(dato, palabras);
+            for (auto it = palabras.begin(); it != palabras.end(); ++it)
+            {
+                infTermPreg.setPosTerm(atoi((*it).c_str()));
+            }
+            indicePregunta.insert({termino, infTermPreg});
+        }
+
+        getline(fichero, dato);
+        informacionColeccionDocs.setNumDocs(atoi(dato.c_str()));
+        getline(fichero, dato);
+        informacionColeccionDocs.setNumTotalPal(atoi(dato.c_str()));
+        getline(fichero, dato);
+        informacionColeccionDocs.setNumTotalPalDiferentes(atoi(dato.c_str()));
+        getline(fichero, dato);
+        informacionColeccionDocs.setNumTotalPalSinParada(atoi(dato.c_str()));
+        getline(fichero, dato);
+        informacionColeccionDocs.setTamBytes(atoi(dato.c_str()));
+
+        getline(fichero, dato);
+        for (int i = atoi(dato.c_str()); i != 0; i--)
+        {
+            string termino;
+            getline(fichero, termino);
+
+            InformacionTermino infoTermino;
+            getline(fichero, dato);
+            infoTermino.setFtc(atoi(dato.c_str()));
+
+            getline(fichero, dato);
+            for (int j = atoi(dato.c_str()); j != 0; j--)
+            {
+                InfTermDoc infTermDoc;
+                string idDoc;
+                getline(fichero, idDoc);
+
+                getline(fichero, dato);
+                infTermDoc.setFt(atoi(dato.c_str()));
+                getline(fichero, dato);
+                tokAux.Tokenizar(dato, palabras);
+                for (auto it = palabras.begin(); it != palabras.end(); ++it)
+                {
+                    infTermDoc.setPosTerm(atoi((*it).c_str()));
+                }
+                infoTermino.insertarDoc(atoi(idDoc.c_str()), infTermDoc);
+            }
+            indice.insert({termino, infoTermino});
+        }
+
+        getline(fichero, dato);
+        for (int i = atoi(dato.c_str()); i != 0; i--)
+        {
+            InfDoc infoDoc;
+            string nomDoc;
+            getline(fichero, nomDoc);
+
+            getline(fichero, dato);
+            infoDoc.setIdDoc(atoi(dato.c_str()));
+            getline(fichero, dato);
+            infoDoc.setNumPal(atoi(dato.c_str()));
+            getline(fichero, dato);
+            infoDoc.setNumPalDiferentes(atoi(dato.c_str()));
+            getline(fichero, dato);
+            infoDoc.setNumPalSinParada(atoi(dato.c_str()));
+            getline(fichero, dato);
+            infoDoc.setTamBytes(atoi(dato.c_str()));
+
+            getline(fichero, dato);
+            palabras.clear();
+            tokAux.Tokenizar(dato, palabras);
+            auto itTokens =  palabras.begin();
+            ++itTokens;
+            Fecha aux;
+            aux.anyo = atoi((*itTokens).c_str());
+            ++itTokens;
+            aux.mes = atoi((*itTokens).c_str());
+            ++itTokens;
+            aux.dia = atoi((*itTokens).c_str());
+            ++itTokens;
+            aux.hora = atoi((*itTokens).c_str());
+            ++itTokens;
+            aux.min = atoi((*itTokens).c_str());
+            ++itTokens;
+            aux.seg = atoi((*itTokens).c_str());
+            ++itTokens;
+            infoDoc.setFechaModificacion(aux);
+            indiceDocs.insert({nomDoc, infoDoc});
+        }
+        getline(fichero, dato);
+        tok.CasosEspeciales(atoi(dato.c_str()));
+        getline(fichero, dato);
+        tok.PasarAminuscSinAcentos(atoi(dato.c_str()));
+        getline(fichero, dato);
+        tok.DelimitadoresPalabra(dato);
+        fichero.close();
+    }
+    else
+    {
+        cout << "Error al abrir el fichero" << endl;
+        return false;
+    }
+    return true;
 }
 
 void IndexadorHash::ImprimirIndexacion() const
