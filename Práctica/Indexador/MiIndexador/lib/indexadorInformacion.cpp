@@ -120,12 +120,10 @@ void InformacionTermino::setFtc(int ftc)
     this->ftc = ftc;
 }
 
-
 void InformacionTermino::insertarDoc(int idDoc, InfTermDoc &infTermDoc)
 {
     l_docs.insert({idDoc, infTermDoc});
 }
-
 
 InfTermDoc InformacionTermino::getInfTermDoc(int idDoc)
 {
@@ -551,7 +549,7 @@ void InformacionPregunta::setNumTotalPalDiferentes(int numTotalPalDiferentes)
 // Operador salida
 ostream &operator<<(ostream &os, const InformacionPregunta &p)
 {
-    os << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: " << p.numTotalPalSinParada << "\tnumTotalPalSinParada: " << p.numTotalPalDiferentes;
+    os << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: " << p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes;
     return os;
 }
 ////////////////////////////////////////////////////////////////////////////

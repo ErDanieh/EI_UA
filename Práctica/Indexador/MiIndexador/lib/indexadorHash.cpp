@@ -145,7 +145,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
         // Cojo el nonbre de un documento
         while (getline(nombresDocumentos, documentoAnalizo))
         {
-            // cout << "Analizando documento : " << documentoAnalizo << "\n";
+            //cout << "Analizando documento : " << documentoAnalizo << "\n";
             auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
             // Reinicio los valores que necesito
             idDocumentoAuxiliar = 0;
@@ -397,7 +397,8 @@ bool IndexadorHash::GuardarIndexacion() const
         {
             ficheroCreado << it->first << "\n";
             ficheroCreado << it->second.getFt() << "\n";
-            for (auto itTerm = it->second.getPosTerm().begin(); itTerm != it->second.getPosTerm().end(); ++itTerm)
+            list<int> posiciones = it->second.getPosTerm();
+            for (auto itTerm = posiciones.begin(); itTerm != posiciones.end(); ++itTerm)
             {
                 ficheroCreado << (*itTerm) << " ";
             }
@@ -417,16 +418,18 @@ bool IndexadorHash::GuardarIndexacion() const
         // Escribimos todos los terminos del indice
         for (auto it = indice.begin(); it != indice.end(); ++it)
         {
+            unordered_map<int, InfTermDoc> aux = it->second.getL_docs();
             ficheroCreado << it->first << "\n";
             ficheroCreado << it->second.getFtc() << "\n";
-            ficheroCreado << it->second.getL_docs().size() << "\n";
+            ficheroCreado << aux.size() << "\n";
 
-            for (auto itTerm = it->second.getL_docs().begin(); itTerm != it->second.getL_docs().end(); ++itTerm)
+            for (auto itTerm = aux.begin(); itTerm != aux.end(); ++itTerm)
             {
                 ficheroCreado << itTerm->first << "\n";
                 ficheroCreado << itTerm->second.getFt() << "\n";
+                list<int> aux2 = itTerm->second.getPosTerm();
 
-                for (auto itTermPos = itTerm->second.getPosTerm().begin(); itTermPos != itTerm->second.getPosTerm().end(); ++itTermPos)
+                for (auto itTermPos = aux2.begin(); itTermPos != aux2.end(); ++itTermPos)
                 {
                     ficheroCreado << (*itTermPos) << " ";
                 }
@@ -595,7 +598,7 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
             getline(fichero, dato);
             palabras.clear();
             tokAux.Tokenizar(dato, palabras);
-            auto itTokens =  palabras.begin();
+            auto itTokens = palabras.begin();
             ++itTokens;
             Fecha aux;
             aux.anyo = atoi((*itTokens).c_str());
@@ -643,7 +646,61 @@ void IndexadorHash::ImprimirIndexacion() const
 
 bool IndexadorHash::IndexarPregunta(const string &preg)
 {
-    // TODO
+    int posTerm = 0;
+    indicePregunta.clear();
+    infPregunta.setNumTotalPal(0);
+    infPregunta.setNumTotalPalDiferentes(0);
+    infPregunta.setNumTotalPalSinParada(0);
+
+    pregunta = preg;
+    list<string> tokensPregunta;
+
+    tok.Tokenizar(pregunta, tokensPregunta);
+
+    infPregunta.setNumTotalPal(tokensPregunta.size());
+
+    if (infPregunta.getNumTotalPal() == 0)
+    {
+        cerr << "No se ha podido indexar la pregunta"
+             << "\n";
+        return false;
+    }
+
+    for (auto it = tokensPregunta.begin(); it != tokensPregunta.end(); ++it)
+    {
+        stemmerIndexador.stemmer((*it), tipoStemmer);
+        auto itStopWords = stopWords.find((*it));
+
+        if (itStopWords == stopWords.end())
+        {
+            string palabra = (*it);
+            auto itIndicePregunta = indicePregunta.find((*it));
+
+            if (itIndicePregunta != indicePregunta.end())
+            {
+                itIndicePregunta->second.setFt(itIndicePregunta->second.getFt() + 1);
+                itIndicePregunta->second.setPosTerm(posTerm);
+            }
+            else
+            {
+                InformacionTerminoPregunta nuevoTermino;
+                nuevoTermino.setFt(1);
+                nuevoTermino.setPosTerm(posTerm);
+                indicePregunta.insert({palabra, nuevoTermino});
+                infPregunta.setNumTotalPalDiferentes(infPregunta.getNumTotalPalDiferentes() + 1);
+            }
+            infPregunta.setNumTotalPalSinParada(infPregunta.getNumTotalPalSinParada() + 1);
+        }
+        ++posTerm;
+    }
+
+    if (infPregunta.getNumTotalPal() == 0)
+    {
+        cerr << "No se ha podido indexar la pregunta"
+             << "\n";
+        return false;
+    }
+    return true;
 }
 
 bool IndexadorHash::DevuelvePregunta(string &preg) const
