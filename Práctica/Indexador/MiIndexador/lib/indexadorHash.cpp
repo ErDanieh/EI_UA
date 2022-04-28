@@ -136,6 +136,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
     int idDocumentoAuxiliar;
     list<string> tokensLineaAnalizo;
     int posTermino;
+    tok.TokenizarListaFicheros(ficheroDocumentos);
 
     // Si se ha podido abrir bien el fichero y podido leer
     if (nombresDocumentos.is_open())
@@ -143,9 +144,9 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
         ifstream documentoAnalizoFich;
         documentoAnalizo = "";
         // Cojo el nonbre de un documento
-        while (getline(nombresDocumentos, documentoAnalizo))
+        while (nombresDocumentos >> documentoAnalizo)
         {
-            //cout << "Analizando documento : " << documentoAnalizo << "\n";
+            // cout << "Analizando documento : " << documentoAnalizo << "\n";
             auto itIndiceDocumentos = indiceDocs.find(documentoAnalizo);
             // Reinicio los valores que necesito
             idDocumentoAuxiliar = 0;
@@ -191,7 +192,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
             {
                 // cout << documentoAnalizo << endl;
                 //  Abrimos el documento que estamos analizando para leerlo
-                documentoAnalizoFich.open(documentoAnalizo.c_str(), ifstream::in);
+                documentoAnalizoFich.open(documentoAnalizo + ".tk", ifstream::in);
 
                 // Si no se ha podido abrir el documento
                 if (!documentoAnalizoFich.good())
@@ -224,86 +225,83 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     // cout << "he asignado la informacion" << endl;
 
                     // Leemos la linea del documento
-                    while (getline(documentoAnalizoFich, lineaAnalizo))
+                    while (documentoAnalizoFich >> lineaAnalizo)
                     {
                         // cout << lineaAnalizo << endl;
                         //  Sacamos los tokens de la linea
-                        tok.Tokenizar(lineaAnalizo, tokensLineaAnalizo);
                         // Asignamos la cantidad de palabras que tiene el documento
                         informacioDocumentoAnalizo.setNumPal(informacioDocumentoAnalizo.getNumPal() + tokensLineaAnalizo.size());
 
                         // Para cada uno de los token que tenemos le pasamos el stemmer y sacamos su informacion
-                        for (auto itTokens = tokensLineaAnalizo.begin(); itTokens != tokensLineaAnalizo.end(); ++itTokens)
+
+                        // Le pasamos el stemmer al token
+                        //stemmerIndexador.stemmer(lineaAnalizo, tipoStemmer);
+                        // Buscamos en nuestras stopWords para ver si tenemos que quitarla o no
+
+                        if (stopWords.find(lineaAnalizo) == stopWords.end())
                         {
-                            // Le pasamos el stemmer al token
-                            stemmerIndexador.stemmer((*itTokens), tipoStemmer);
-                            // Buscamos en nuestras stopWords para ver si tenemos que quitarla o no
+                            // Incrementamos el numero de palabras sin parada
+                            informacioDocumentoAnalizo.setNumPalSinParada(informacioDocumentoAnalizo.getNumPalSinParada() + 1);
 
-                            if (stopWords.find((*itTokens)) == stopWords.end())
+                            // Comprobamos si el termino ya esta en el indice
+                            auto PalabrasIndice = indice.find(lineaAnalizo);
+
+                            // Si el termino ya existe lo que vamos a hacer es cargar su informacion y modificarla
+                            if (PalabrasIndice == indice.end())
                             {
-                                // Incrementamos el numero de palabras sin parada
-                                informacioDocumentoAnalizo.setNumPalSinParada(informacioDocumentoAnalizo.getNumPalSinParada() + 1);
 
-                                // Comprobamos si el termino ya esta en el indice
-                                auto PalabrasIndice = indice.find((*itTokens));
+                                // cout << " No existe en el indice" << endl;
 
-                                // Si el termino ya existe lo que vamos a hacer es cargar su informacion y modificarla
-                                if (PalabrasIndice == indice.end())
-                                {
+                                // Esta la informacion que tenemos del termino en general
+                                InformacionTermino informacionTermino;
+                                // Esta es la informacion del termino en el documento
+                                InfTermDoc informacionTerminoEnDocumento;
 
-                                    // cout << " No existe en el indice" << endl;
+                                //   Incrementamos las palabras diferentes que tenemos en el documento
+                                informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
+                                // Incrementamos nuestra coleccion de palabras diferentes
+                                informacionColeccionDocs.setNumTotalPalDiferentes(informacionColeccionDocs.getNumTotalPalDiferentes() + 1);
 
-                                    // Esta la informacion que tenemos del termino en general
-                                    InformacionTermino informacionTermino;
-                                    // Esta es la informacion del termino en el documento
-                                    InfTermDoc informacionTerminoEnDocumento;
+                                // Le asignamos la informacion inicial al termino
+                                informacionTerminoEnDocumento.setFt(1);
+                                informacionTerminoEnDocumento.setPosTerm(posTermino);
+                                // Inicializamos la informacion global del termino
+                                informacionTermino.setFtc(1);
 
-                                    //   Incrementamos las palabras diferentes que tenemos en el documento
-                                    informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
-                                    // Incrementamos nuestra coleccion de palabras diferentes
-                                    informacionColeccionDocs.setNumTotalPalDiferentes(informacionColeccionDocs.getNumTotalPalDiferentes() + 1);
+                                informacionTermino.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoEnDocumento);
 
-                                    // Le asignamos la informacion inicial al termino
-                                    informacionTerminoEnDocumento.setFt(1);
-                                    informacionTerminoEnDocumento.setPosTerm(posTermino);
-                                    // Inicializamos la informacion global del termino
-                                    informacionTermino.setFtc(1);
-
-                                    informacionTermino.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoEnDocumento);
-
-                                    // Insertamos el termino en el indice
-                                    indice.insert({(*itTokens), informacionTermino});
-                                }
-                                else // Si el termino no existe lo que vamos a hacer es insertarlo
-                                {
-                                    // cout << " Ya existe en el indice" << endl;
-                                    //   Cargamos la informacion del termino
-                                    auto aux = PalabrasIndice->second.getL_docs();
-                                    auto informacionTerminoCargado = aux.find(informacioDocumentoAnalizo.getIdDoc());
-
-                                    // El termino existe ya en el documento por lo tanto actualizamos frencuencia y posicion
-                                    if (informacionTerminoCargado != aux.end())
-                                    {
-                                        // cout << "Ya existe en el documento" << endl;
-                                        // cout << "Añado el termino " << (*itTokens) << " al documento " << informacioDocumentoAnalizo.getIdDoc() << " con " << informacionTerminoCargado->second << " " << endl;
-                                        PalabrasIndice->second.modificarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoCargado->second.getFt() + 1, posTermino);
-                                    }
-                                    else // El termino no ha aparecido el documento hasta ahora por lo tanto lo anadimos
-                                    {
-                                        // cout << "No existe en el documento" << endl;
-                                        informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
-                                        InfTermDoc informacionTerminoDocumento;
-                                        informacionTerminoDocumento.setFt(1);
-                                        informacionTerminoDocumento.setPosTerm(posTermino);
-                                        // cout << "Añado el termino " << (*itTokens) << " al documento " << informacioDocumentoAnalizo.getIdDoc() << " con " << informacionTerminoDocumento << " " << endl;
-                                        PalabrasIndice->second.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento);
-                                    }
-                                    PalabrasIndice->second.setFtc(PalabrasIndice->second.getFtc() + 1);
-                                }
+                                // Insertamos el termino en el indice
+                                indice.insert({lineaAnalizo, informacionTermino});
                             }
+                            else // Si el termino no existe lo que vamos a hacer es insertarlo
+                            {
+                                // cout << " Ya existe en el indice" << endl;
+                                //   Cargamos la informacion del termino
+                                auto aux = PalabrasIndice->second.getL_docs();
+                                auto informacionTerminoCargado = aux.find(informacioDocumentoAnalizo.getIdDoc());
 
-                            ++posTermino;
+                                // El termino existe ya en el documento por lo tanto actualizamos frencuencia y posicion
+                                if (informacionTerminoCargado != aux.end())
+                                {
+                                    // cout << "Ya existe en el documento" << endl;
+                                    // cout << "Añado el termino " << (*itTokens) << " al documento " << informacioDocumentoAnalizo.getIdDoc() << " con " << informacionTerminoCargado->second << " " << endl;
+                                    PalabrasIndice->second.modificarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoCargado->second.getFt() + 1, posTermino);
+                                }
+                                else // El termino no ha aparecido el documento hasta ahora por lo tanto lo anadimos
+                                {
+                                    // cout << "No existe en el documento" << endl;
+                                    informacioDocumentoAnalizo.setNumPalDiferentes(informacioDocumentoAnalizo.getNumPalDiferentes() + 1);
+                                    InfTermDoc informacionTerminoDocumento;
+                                    informacionTerminoDocumento.setFt(1);
+                                    informacionTerminoDocumento.setPosTerm(posTermino);
+                                    // cout << "Añado el termino " << (*itTokens) << " al documento " << informacioDocumentoAnalizo.getIdDoc() << " con " << informacionTerminoDocumento << " " << endl;
+                                    PalabrasIndice->second.insertarDoc(informacioDocumentoAnalizo.getIdDoc(), informacionTerminoDocumento);
+                                }
+                                PalabrasIndice->second.setFtc(PalabrasIndice->second.getFtc() + 1);
+                            }
                         }
+
+                        ++posTermino;
 
                         lineaAnalizo.clear();
                     }
