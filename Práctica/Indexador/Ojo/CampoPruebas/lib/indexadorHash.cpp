@@ -584,7 +584,7 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
 
         int cantDocs;
         getline(fichero, dato);
-        //cout << "Cantidad de documentos: " << dato;
+        // cout << "Cantidad de documentos: " << dato;
 
         cantDocs = atoi(dato.c_str());
         int j = 0;
@@ -742,8 +742,13 @@ bool IndexadorHash::DevuelvePregunta(string &preg) const
 
 bool IndexadorHash::DevuelvePregunta(const string &word, InformacionTerminoPregunta &inf) const
 {
+    string palabra = word;
+    if (tok.PasarAminuscSinAcentos())
+    {
+        palabra = tok.normalizaAcentosMinusculas(word);
+    }
     // Buscamos el termino en el indice de pregunta mediante un iterador
-    auto it = indicePregunta.find(word);
+    auto it = indicePregunta.find(palabra);
 
     if (it != indicePregunta.end())
     {
