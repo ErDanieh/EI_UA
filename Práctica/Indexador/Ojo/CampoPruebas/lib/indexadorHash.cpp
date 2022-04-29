@@ -222,7 +222,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                 InfTermDoc infoTermDoc(1, posTermino);
                                 pair<int, InfTermDoc> pareja(informacionColeccionDocs.getNumDocs(), infoTermDoc);
                                 InformacionTermino infoTermino(1, pareja);
-                                
+
                                 // Incrementamos el total de palabras del documento
                                 // infoDoc.getNumPalDiferentes(palDiferentes);
                                 ++palDiferentes;
@@ -242,8 +242,8 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                 {
                                     // cout << "Edito"<< endl;
 
-                                    //docu->second.getFtc(ftc);
-                                    //docu->second.setFtc(ftc + 1);
+                                    // docu->second.getFtc(ftc);
+                                    // docu->second.setFtc(ftc + 1);
                                     docu->second.incrementarFt(informacionColeccionDocs.getNumDocs());
                                     docu->second.modificarDoc(informacionColeccionDocs.getNumDocs(), posTermino);
                                 }
@@ -252,7 +252,6 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                     // cout << "Añado" << endl;
                                     int num;
                                     ++palDiferentes;
-                                    
 
                                     InfTermDoc infoTermDoc(1, posTermino);
                                     pair<int, InfTermDoc> pareja(informacionColeccionDocs.getNumDocs(), infoTermDoc);
@@ -277,7 +276,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                 infoDoc.setNumPalDiferentes(palDiferentes);
                 // informacionColeccionDocs.setNumDocs(informacionColeccionDocs.getNumDocs() + 1);
                 indiceDocs.insert(pair<string, InfDoc>(nombreDocu, infoDoc));
-                //cout << "Documento " << nombreDocu << " indexado correctamente" << endl;
+                // cout << "Documento " << nombreDocu << " indexado correctamente" << endl;
                 ficheroAnalizo.close();
             }
         }
@@ -330,18 +329,24 @@ bool IndexadorHash::GuardarIndexacion() const
     }
     else
     {
+        // cout << "Almacenando " << this->almacenarPosTerm << endl;
         ficheroCreado << this->almacenarPosTerm << "\n";
+        // cout << "Almacenando " << this->almacenarEnDisco << endl;
         ficheroCreado << this->almacenarEnDisco << "\n";
+        // cout << "Almacenando " << this->ficheroStopWords << endl;
         ficheroCreado << this->ficheroStopWords << "\n";
+
         // Escribimos todas las stopWords en el fichero
         for (auto it = this->stopWords.begin(); it != this->stopWords.end(); ++it)
         {
+            // cout << "StopWord: " << *it << endl;
             ficheroCreado << *it << " ";
         }
         ficheroCreado << "\n";
 
         // Escribimos toda la informacion de la pregunta
         ficheroCreado << this->infPregunta.getNumTotalPal() << "\n";
+
         ficheroCreado << this->infPregunta.getNumTotalPalDiferentes() << "\n";
         ficheroCreado << this->infPregunta.getNumTotalPalSinParada() << "\n";
         ficheroCreado << this->pregunta << "\n";
@@ -366,6 +371,7 @@ bool IndexadorHash::GuardarIndexacion() const
         ficheroCreado << this->informacionColeccionDocs.getNumTotalPalDiferentes() << "\n";
         ficheroCreado << this->informacionColeccionDocs.getNumTotalPalSinParada() << "\n";
         ficheroCreado << this->informacionColeccionDocs.getTamBytes() << "\n";
+        // cout <<"Tambytes escribo:" <<this->informacionColeccionDocs.getTamBytes() << endl;
 
         // Metemos el tamanyo del indice
         ficheroCreado << this->indice.size() << "\n";
@@ -373,13 +379,17 @@ bool IndexadorHash::GuardarIndexacion() const
         for (auto it = indice.begin(); it != indice.end(); ++it)
         {
             it->second.getL_docs(aux);
+            // cout << it->first << endl;
             ficheroCreado << it->first << "\n";
             it->second.getFtc(dato);
+            // cout << dato << endl;
+            // cout << aux.size() << endl;
             ficheroCreado << dato << "\n";
             ficheroCreado << aux.size() << "\n";
 
             for (auto itTerm = aux.begin(); itTerm != aux.end(); ++itTerm)
             {
+                // cout<< itTerm->first << endl;
                 ficheroCreado << itTerm->first << "\n";
                 itTerm->second.getFt(dato);
                 ficheroCreado << dato << "\n";
@@ -387,8 +397,10 @@ bool IndexadorHash::GuardarIndexacion() const
 
                 for (auto itTermPos = aux2.begin(); itTermPos != aux2.end(); ++itTermPos)
                 {
+                    // cout << (*itTermPos) << " ";
                     ficheroCreado << (*itTermPos) << " ";
                 }
+                // cout << endl;
                 ficheroCreado << "\n";
             }
             // El intro nos indica que pasamos al siguiente termino
@@ -430,6 +442,7 @@ bool IndexadorHash::GuardarIndexacion() const
 
 bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
 {
+    // cout << "RECUPERANDO INDEXACION" << endl;
     indice.clear();
     indiceDocs.clear();
     indicePregunta.clear();
@@ -454,11 +467,14 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
 
         getline(fichero, dato);
         almacenarPosTerm = atoi(dato.c_str());
+        // out << "Almacenando " << this->almacenarPosTerm << endl;
 
         getline(fichero, dato);
         almacenarEnDisco = atoi(dato.c_str());
+        // cout << "Almacenando " << this->almacenarEnDisco << endl;
 
         getline(fichero, ficheroStopWords);
+        // cout << "Almacenando " << this->ficheroStopWords << endl;
 
         // Cogemos todas las stopWords separadas por espacios y nos las guardamos
         getline(fichero, dato);
@@ -466,11 +482,13 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
         tokAux.Tokenizar(dato, listaStopWords);
         for (auto it = listaStopWords.begin(); it != listaStopWords.end(); ++it)
         {
+            // cout << "StopWord: " << *it << endl;
             stopWords.insert(*it);
         }
 
         getline(fichero, dato);
         infPregunta.setNumTotalPal(atoi(dato.c_str()));
+        // cout << dato << endl;
 
         getline(fichero, dato);
         infPregunta.setNumTotalPalDiferentes(atoi(dato.c_str()));
@@ -478,7 +496,8 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
         getline(fichero, dato);
         infPregunta.setNumTotalPalSinParada(atoi(dato.c_str()));
 
-        getline(fichero, pregunta);
+        // Nos comemos el intro
+        fichero >> dato;
 
         getline(fichero, dato);
         for (unsigned i = atoi(dato.c_str()); i > 0; i--)
@@ -510,77 +529,119 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
         informacionColeccionDocs.setNumTotalPalSinParada(atoi(dato.c_str()));
         getline(fichero, dato);
         informacionColeccionDocs.setTamBytes(atoi(dato.c_str()));
+        // cout << "Tambytes guardo: ";
+        // cout << dato << endl;
 
         getline(fichero, dato);
-        for (int i = atoi(dato.c_str()); i != 0; i--)
+        // cout << "tamaño indice:" << dato << endl;
+        int tam = atoi(dato.c_str());
+        int i = 0;
+        while (i != tam)
         {
+            // cout << i << endl;
             string termino;
             getline(fichero, termino);
+            // cout<<"Termino: " << termino << endl;
 
             InformacionTermino infoTermino;
             getline(fichero, dato);
+            // cout<< "FTC: " << dato << endl;
             infoTermino.setFtc(atoi(dato.c_str()));
 
+            int lDocsSize;
             getline(fichero, dato);
-            for (int j = atoi(dato.c_str()); j != 0; j--)
+            lDocsSize = atoi(dato.c_str());
+            // cout << "lDocsSize: " << lDocsSize << endl;
+
+            for (int j = 0; j <= lDocsSize - 1; j++)
             {
-                getline(fichero, idDoc);
+                InfTermDoc infoTerminoDoc;
+                // Cogemos el id del documento
+                getline(fichero, dato);
+                int idDoc = atoi(dato.c_str());
+                // Seteamo el ft del documento
+                getline(fichero, dato);
+                int ft = atoi(dato.c_str());
+                infoTerminoDoc.setFt(ft);
 
                 getline(fichero, dato);
-                infTermDoc.setFt(atoi(dato.c_str()));
-                getline(fichero, dato);
+                // cout << "Posiciones: " << dato << endl;
                 tokAux.Tokenizar(dato, palabras);
                 for (auto it = palabras.begin(); it != palabras.end(); ++it)
                 {
-                    pos = atoi((*it).c_str());
-                    infTermDoc.setPosTerm(pos);
+                    int pos = atoi((*it).c_str());
+                    infoTerminoDoc.setPosTerm(pos);
                 }
-                int id = atoi(idDoc.c_str());
-                pair<int, InfTermDoc> par(id, infTermDoc);
-                infoTermino.insertarDoc(par);
+                pair<int, InfTermDoc> p = make_pair(idDoc, infoTerminoDoc);
+                infoTermino.insertarDoc(p);
             }
+            // cout << infoTermino << endl;
             indice.insert({termino, infoTermino});
+            // cout << "otra palabra"<< endl;
+            i++;
+            getline(fichero, dato);
         }
 
+        int cantDocs;
         getline(fichero, dato);
-        for (int i = atoi(dato.c_str()); i != 0; i--)
+        //cout << "Cantidad de documentos: " << dato;
+
+        cantDocs = atoi(dato.c_str());
+        int j = 0;
+
+        while (j != cantDocs)
         {
             InfDoc infoDoc;
-            string nomDoc;
-            getline(fichero, nomDoc);
+            string nombreDoc;
+            getline(fichero, nombreDoc);
+
+            int idDoc;
+            getline(fichero, dato);
+            idDoc = atoi(dato.c_str());
+            infoDoc.setIdDoc(idDoc);
+
+            int palabras;
+            getline(fichero, dato);
+            palabras = atoi(dato.c_str());
+            infoDoc.setNumPal(palabras);
 
             getline(fichero, dato);
-            infoDoc.setIdDoc(atoi(dato.c_str()));
-            getline(fichero, dato);
-            infoDoc.setNumPal(atoi(dato.c_str()));
-            getline(fichero, dato);
-            infoDoc.setNumPalDiferentes(atoi(dato.c_str()));
-            getline(fichero, dato);
-            infoDoc.setNumPalSinParada(atoi(dato.c_str()));
-            getline(fichero, dato);
-            infoDoc.setTamBytes(atoi(dato.c_str()));
+            palabras = atoi(dato.c_str());
+            infoDoc.setNumPalDiferentes(palabras);
 
             getline(fichero, dato);
-            palabras.clear();
-            tokAux.Tokenizar(dato, palabras);
-            auto itTokens = palabras.begin();
-            ++itTokens;
-            Fecha aux;
-            aux.anyo = atoi((*itTokens).c_str());
-            ++itTokens;
-            aux.mes = atoi((*itTokens).c_str());
-            ++itTokens;
-            aux.dia = atoi((*itTokens).c_str());
-            ++itTokens;
-            aux.hora = atoi((*itTokens).c_str());
-            ++itTokens;
-            aux.min = atoi((*itTokens).c_str());
-            ++itTokens;
-            aux.seg = atoi((*itTokens).c_str());
-            ++itTokens;
-            infoDoc.setFechaModificacion(aux);
-            indiceDocs.insert({nomDoc, infoDoc});
+            palabras = atoi(dato.c_str());
+            infoDoc.setNumPalSinParada(palabras);
+
+            int tambytes;
+            getline(fichero, dato);
+            tambytes = atoi(dato.c_str());
+            infoDoc.setTamBytes(tambytes);
+
+            int datoFecha;
+            Fecha fecha;
+            getline(fichero, dato);
+            datoFecha = atoi(dato.c_str());
+            fecha.anyo = datoFecha;
+            getline(fichero, dato);
+            datoFecha = atoi(dato.c_str());
+            fecha.mes = datoFecha;
+            getline(fichero, dato);
+            datoFecha = atoi(dato.c_str());
+            fecha.dia = datoFecha;
+            getline(fichero, dato);
+            datoFecha = atoi(dato.c_str());
+            fecha.hora = datoFecha;
+            getline(fichero, dato);
+            datoFecha = atoi(dato.c_str());
+            fecha.min = datoFecha;
+            getline(fichero, dato);
+            datoFecha = atoi(dato.c_str());
+            fecha.seg = datoFecha;
+            j++;
+            indiceDocs.insert({nombreDoc, infoDoc});
         }
+
         getline(fichero, dato);
         tok.CasosEspeciales(atoi(dato.c_str()));
         getline(fichero, dato);
