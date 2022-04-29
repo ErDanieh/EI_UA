@@ -652,7 +652,7 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
     }
     else
     {
-        cout << "Error al abrir el fichero" << endl;
+        cerr << "ERROR: al abrir el fichero" << endl;
         return false;
     }
     return true;
