@@ -292,7 +292,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
 
     if (this->almacenarEnDisco)
     {
-        GuardarIndexacion();
+        return GuardarIndexacion();
     }
 
     return true;
@@ -657,7 +657,7 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
             getline(fichero, dato);
             datoFecha = atoi(dato.c_str());
             fecha.seg = datoFecha;
-            
+
             j++;
             indiceDocs.insert({nombreDoc, infoDoc});
         }
@@ -749,7 +749,7 @@ bool IndexadorHash::IndexarPregunta(const string &preg)
 
     if (this->almacenarEnDisco)
     {
-        GuardarIndexacion();
+       return GuardarIndexacion();
     }
 
     return true;
