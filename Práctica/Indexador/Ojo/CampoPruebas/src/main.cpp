@@ -1,39 +1,34 @@
-#include <iostream> 
+#include <iostream>
 #include <string>
-#include <list> 
+#include <list>
+#include <sys/resource.h>
 #include "indexadorHash.h"
-#include "indexadorInformacion.h"
-
 using namespace std;
-
-int
-main(void)
+double getcputime(void)
 {
-IndexadorHash b("./StopWordsEspanyol.txt", ". ,:", false, true, "./indicePrueba", 0, true, true);
-b.IndexarPregunta("pal1 yo pal2 pal1. PaL3 el  ");
-IndexadorHash a("./indicePrueba");
-string preg1;
-InformacionPregunta infPreg1;
+	struct timeval tim;
+	struct rusage ru;
+	getrusage(RUSAGE_SELF, &ru);
+	tim = ru.ru_utime;
+	double t = (double)tim.tv_sec + (double)tim.tv_usec / 1000000.0;
+	tim = ru.ru_stime;
+	t += (double)tim.tv_sec + (double)tim.tv_usec / 1000000.0;
+	return t;
+}
+main()
+{
+	long double aa = getcputime();
+	IndexadorHash b("./StopWordsEspanyol.txt", ". ,:", false, false,
+					"./indicePruebaEspanyol", 0, true, true);
+	b.Indexar("listaFicheros.txt");
+
+	cout << b << endl;
+
+	b.IndexarPregunta("¿Quién es el presidente de la UE?");
+
+	IndexadorHash a("./indicePruebaEspanyol");
+	cout << a << endl;
 
 
-InformacionTerminoPregunta inf1;
-
-if(a.DevuelvePregunta("Pal3", inf1))
-    cout << "Pal3 SE HA INDEXADO EN LA PREGUNTA: " << inf1 << endl;
-else
-    cout << "Pal3 NO SE HA INDEXADO EN LA PREGUNTA" << endl;
-
-if(a.DevuelvePregunta("PaL3", inf1))
-    cout << "PaL3 SE HA INDEXADO EN LA PREGUNTA: " << inf1 << endl;
-else
-    cout << "PaL3 NO SE HA INDEXADO EN LA PREGUNTA" << endl;
-
-
-if(a.DevuelvePregunta("pal3", inf1))
-    cout << "pal3 SE HA INDEXADO EN LA PREGUNTA: " << inf1 << endl;
-else
-    cout << "pal3 NO SE HA INDEXADO EN LA PREGUNTA" << endl;
-
-
-
+	cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
 }
