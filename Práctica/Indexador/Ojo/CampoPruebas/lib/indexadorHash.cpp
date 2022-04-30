@@ -289,6 +289,12 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
         return false;
     }
     ficheroNombres.close();
+
+    if (this->almacenarEnDisco)
+    {
+        GuardarIndexacion();
+    }
+
     return true;
 }
 
@@ -358,6 +364,7 @@ bool IndexadorHash::GuardarIndexacion() const
         ficheroCreado << this->infPregunta.getNumTotalPalSinParada() << "\n";
         ficheroCreado << this->pregunta << "\n";
         ficheroCreado << indicePregunta.size() << "\n";
+        //cout<< "Indice pregunta: " << indicePregunta.size() << endl;
         // Escribimos la informacion de todos los terminos de la pregunta
         for (auto it = indicePregunta.begin(); it != indicePregunta.end(); ++it)
         {
@@ -503,10 +510,10 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
         getline(fichero, dato);
         infPregunta.setNumTotalPalSinParada(atoi(dato.c_str()));
 
-        // Nos comemos el intro
-        fichero >> dato;
 
+        getline(fichero, this->pregunta);
         getline(fichero, dato);
+        //cout << "Indice pregunta leo: " << dato << endl;
         for (unsigned i = atoi(dato.c_str()); i > 0; i--)
         {
             string termino;
@@ -630,21 +637,27 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
             getline(fichero, dato);
             datoFecha = atoi(dato.c_str());
             fecha.anyo = datoFecha;
+
             getline(fichero, dato);
             datoFecha = atoi(dato.c_str());
             fecha.mes = datoFecha;
+
             getline(fichero, dato);
             datoFecha = atoi(dato.c_str());
             fecha.dia = datoFecha;
+
             getline(fichero, dato);
             datoFecha = atoi(dato.c_str());
             fecha.hora = datoFecha;
+
             getline(fichero, dato);
             datoFecha = atoi(dato.c_str());
             fecha.min = datoFecha;
+
             getline(fichero, dato);
             datoFecha = atoi(dato.c_str());
             fecha.seg = datoFecha;
+            
             j++;
             indiceDocs.insert({nombreDoc, infoDoc});
         }
@@ -733,6 +746,12 @@ bool IndexadorHash::IndexarPregunta(const string &preg)
              << "\n";
         return false;
     }
+
+    if (this->almacenarEnDisco)
+    {
+        GuardarIndexacion();
+    }
+
     return true;
 }
 
