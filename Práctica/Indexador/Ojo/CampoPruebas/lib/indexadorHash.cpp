@@ -128,7 +128,7 @@ IndexadorHash &IndexadorHash::operator=(const IndexadorHash &ind)
 bool IndexadorHash::Indexar(const string &ficheroDocumentos)
 {
     // Tokenizamos la lista de ficheros
-    tok.TokenizarListaFicheros(ficheroDocumentos);
+    bool nice = tok.TokenizarListaFicheros(ficheroDocumentos);
     ifstream ficheroNombres(ficheroDocumentos, ifstream::in);
     ifstream ficheroAnalizo;
     string nombreDocu = "";
@@ -145,7 +145,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
     int numTotal = 0;
     int ftc;
 
-    if (ficheroNombres.is_open())
+    if (ficheroNombres.is_open() && nice)
     {
         while (ficheroNombres >> nombreDocu)
         {
@@ -203,6 +203,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
 
                         infoDoc.setIdDoc(informacionColeccionDocs.getNumDocs());
                     }
+                    int id = informacionColeccionDocs.getNumDocs();
                     // Asignamos las stats de nuestro documento
                     infoDoc.setTamBytes(infoDocumento.st_size);
                     infoDoc.setFechaModificacion(fechaDocu);
@@ -210,7 +211,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     {
                         ++numTotal;
 
-                        // stemmerIndexador.stemmer(linea, tipoStemmer);
+                        stemmerIndexador.stemmer(linea, tipoStemmer);
 
                         // No es una stopWord pasamos a indexarlar
                         if (stopWords.find(linea) == stopWords.end())
@@ -220,7 +221,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                             if (indice.find(linea) == indice.end())
                             {
                                 InfTermDoc infoTermDoc(1, posTermino);
-                                pair<int, InfTermDoc> pareja(informacionColeccionDocs.getNumDocs(), infoTermDoc);
+                                pair<int, InfTermDoc> pareja(id, infoTermDoc);
                                 InformacionTermino infoTermino(1, pareja);
 
                                 // Incrementamos el total de palabras del documento
@@ -238,14 +239,14 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                             {
                                 auto docu = indice.find(linea);
                                 // Existe el documento dentro de su L_Docs
-                                if (docu->second.existeDocu(informacionColeccionDocs.getNumDocs()))
+                                if (docu->second.existeDocu(id))
                                 {
                                     // cout << "Edito"<< endl;
 
                                     // docu->second.getFtc(ftc);
                                     // docu->second.setFtc(ftc + 1);
-                                    docu->second.incrementarFt(informacionColeccionDocs.getNumDocs());
-                                    docu->second.modificarDoc(informacionColeccionDocs.getNumDocs(), posTermino);
+                                    docu->second.incrementarFt(id);
+                                    docu->second.modificarDoc(id, posTermino);
                                 }
                                 else // Si existe pero no en el documento actual
                                 {
@@ -254,7 +255,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                                     ++palDiferentes;
 
                                     InfTermDoc infoTermDoc(1, posTermino);
-                                    pair<int, InfTermDoc> pareja(informacionColeccionDocs.getNumDocs(), infoTermDoc);
+                                    pair<int, InfTermDoc> pareja(id, infoTermDoc);
 
                                     docu->second.insertarDoc(pareja);
                                 }
@@ -280,6 +281,12 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                 ficheroAnalizo.close();
             }
         }
+    }
+    else
+    {
+        cerr << "ERROR: No se ha podido abrir el directorio " << ficheroDocumentos << "\n";
+        cerr << "ERROR: No se ha podido Tokenizar " << endl;
+        return false;
     }
     ficheroNombres.close();
     return true;
