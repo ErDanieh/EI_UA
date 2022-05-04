@@ -145,6 +145,10 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
     int numTotal = 0;
     int ftc;
 
+    int numTotalColec = 0;
+    int numTotalSinParada = 0;
+    int numTotalBytes = 0;
+
     if (ficheroNombres.is_open() && nice)
     {
         while (ficheroNombres >> nombreDocu)
@@ -206,10 +210,12 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     int id = informacionColeccionDocs.getNumDocs();
                     // Asignamos las stats de nuestro documento
                     infoDoc.setTamBytes(infoDocumento.st_size);
+                    numTotalBytes += infoDocumento.st_size;
                     infoDoc.setFechaModificacion(fechaDocu);
                     while (ficheroAnalizo >> linea)
                     {
                         ++numTotal;
+                        ++numTotalColec;
 
                         stemmerIndexador.stemmer(linea, tipoStemmer);
 
@@ -217,6 +223,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                         if (stopWords.find(linea) == stopWords.end())
                         {
                             ++sinParada;
+                            ++numTotalSinParada;
                             // Si la palabra no esta en el indice la añadimos
                             if (indice.find(linea) == indice.end())
                             {
@@ -269,9 +276,6 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     }
                 }
 
-                informacionColeccionDocs.setNumTotalPal(informacionColeccionDocs.getNumTotalPal() + numTotal);
-                informacionColeccionDocs.setNumTotalPalSinParada(informacionColeccionDocs.getNumTotalPalSinParada() + sinParada);
-                informacionColeccionDocs.setTamBytes(informacionColeccionDocs.getTamBytes() + infoDocumento.st_size);
                 infoDoc.setNumPalSinParada(sinParada);
                 infoDoc.setNumPal(numTotal);
                 infoDoc.setNumPalDiferentes(palDiferentes);
@@ -281,6 +285,9 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                 ficheroAnalizo.close();
             }
         }
+        informacionColeccionDocs.setNumTotalPal(informacionColeccionDocs.getNumTotalPal() + numTotalColec);
+        informacionColeccionDocs.setNumTotalPalSinParada(informacionColeccionDocs.getNumTotalPalSinParada() + numTotalSinParada);
+        informacionColeccionDocs.setTamBytes(informacionColeccionDocs.getTamBytes() + numTotalBytes);
     }
     else
     {
@@ -364,8 +371,8 @@ bool IndexadorHash::GuardarIndexacion() const
         ficheroCreado << this->infPregunta.getNumTotalPalSinParada() << "\n";
         ficheroCreado << this->pregunta << "\n";
         ficheroCreado << indicePregunta.size() << "\n";
-        //cout<< "Indice pregunta: " << indicePregunta.size() << endl;
-        // Escribimos la informacion de todos los terminos de la pregunta
+        // cout<< "Indice pregunta: " << indicePregunta.size() << endl;
+        //  Escribimos la informacion de todos los terminos de la pregunta
         for (auto it = indicePregunta.begin(); it != indicePregunta.end(); ++it)
         {
             ficheroCreado << it->first << "\n";
@@ -510,10 +517,9 @@ bool IndexadorHash::RecuperarIndexacion(const string &directorioIndexacion)
         getline(fichero, dato);
         infPregunta.setNumTotalPalSinParada(atoi(dato.c_str()));
 
-
         getline(fichero, this->pregunta);
         getline(fichero, dato);
-        //cout << "Indice pregunta leo: " << dato << endl;
+        // cout << "Indice pregunta leo: " << dato << endl;
         for (unsigned i = atoi(dato.c_str()); i > 0; i--)
         {
             string termino;
@@ -749,7 +755,7 @@ bool IndexadorHash::IndexarPregunta(const string &preg)
 
     if (this->almacenarEnDisco)
     {
-       return GuardarIndexacion();
+        return GuardarIndexacion();
     }
 
     return true;
