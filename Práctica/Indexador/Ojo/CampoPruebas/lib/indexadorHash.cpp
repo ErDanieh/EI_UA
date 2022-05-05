@@ -216,8 +216,9 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     {
                         ++numTotal;
                         ++numTotalColec;
-
-                        stemmerIndexador.stemmer(linea, tipoStemmer);
+                        
+                        if (tipoStemmer != 0)
+                            stemmerIndexador.stemmer(linea, tipoStemmer);
 
                         // No es una stopWord pasamos a indexarlar
                         if (stopWords.find(linea) == stopWords.end())
