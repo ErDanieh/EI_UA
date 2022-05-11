@@ -216,7 +216,7 @@ bool IndexadorHash::Indexar(const string &ficheroDocumentos)
                     {
                         ++numTotal;
                         ++numTotalColec;
-                        
+
                         if (tipoStemmer != 0)
                             stemmerIndexador.stemmer(linea, tipoStemmer);
 
@@ -914,6 +914,12 @@ bool IndexadorHash::BorraDoc(const string &nomDoc)
         it->second.getTamBytes(dato);
         informacionColeccionDocs.setTamBytes(informacionColeccionDocs.getTamBytes() - dato);
         indiceDocs.erase(it);
+
+        if (this->almacenarEnDisco)
+        {
+            GuardarIndexacion();
+        }
+
         return true;
     }
     return false;
@@ -934,6 +940,10 @@ bool IndexadorHash::Actualiza(const string &word, const InformacionTermino &inf)
     if (Existe(word))
     {
         indice[word] = inf;
+        if (this->almacenarEnDisco)
+        {
+            GuardarIndexacion();
+        }
         return true;
     }
     else
@@ -949,6 +959,11 @@ bool IndexadorHash::Inserta(const string &word, const InformacionTermino &inf)
     if (aux == indice.end())
     {
         indice.insert({word, inf});
+
+        if (this->almacenarEnDisco)
+        {
+            GuardarIndexacion();
+        }
         return true;
     }
     return false;
