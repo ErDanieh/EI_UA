@@ -174,16 +174,126 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
     double ftd = 0.0;    // número de veces que el término t aparece en el documento d
     double lambda = 0.0; // es la razón entre la frecuencia del término en la colección y la cantidad de documentos en la colección
     double first = 0.0;
-    double avg = 0.0; //media en palabras (no de parada) de los documentos
+    double avg = 0.0; // media en palabras (no de parada) de los documentos
+    priority_queue<pair<double, long>> aux;
 
-    avg = (double) informacionColeccionDocs.getNumTotalPalSinParada() / (double) informacionColeccionDocs.getNumDocs();
-    unordered_map<string, InformacionTerminoPregunta>::iterator infTermPregunta;
-    unordered_map<string, InformacionTermino>::iterator informacionTermino;
-    unordered_map<long, InfTermDoc>::iterator terminoDoc;
-    unordered_map<string,InfDoc>::iterator informacionDoc;
+    avg = (double)informacionColeccionDocs.getNumTotalPalSinParada() / (double)informacionColeccionDocs.getNumDocs();
 
+    for (auto informacionDoc = indiceDocs.begin(); informacionDoc != indiceDocs.end(); ++informacionDoc)
+    {
+        // Para cada documento sacamos su similitud
+        vSimilitud = 0.0;
+        for (auto infTermPregunta = indicePregunta.begin(); infTermPregunta != indicePregunta.end(); ++infTermPregunta)
+        {
+            // Para cada termino de la pregunta lo buscamos en el indice
+            auto informacionTermino = indice.find(infTermPregunta->first);
+            // Comprobamos que no se haya acabado el indice
+            if (informacionTermino != indice.end())
+            {
+                // Sacamos la información del termino en el documento
+                unordered_map<int, InfTermDoc> informacionTerminoDocs;
+                informacionTermino->second.getL_docs(informacionTerminoDocs);
+                int idDoc;
+                informacionDoc->second.getIdDoc(idDoc);
+
+                auto infoTerminoDoc = informacionTerminoDocs.find(idDoc);
+
+                if (infoTerminoDoc != informacionTerminoDocs.end())
+                {
+                    int ft;
+                    infoTerminoDoc->second.getFt(ft);
+                    int ftc;
+                    informacionTermino->second.getFtc(ftc);
+
+                    if (ft != 0) // Si el termino aparece al menos una vez en el documento aplicamos la formula
+                    {
+                        // Sacamos el peso en la query del termino i de la query q
+                        wiq = (double)ft / (double)infPregunta.getNumTotalPal();
+                        lambda = (double)ftc / (double)informacionColeccionDocs.getNumDocs();
+                        ftd = ft * log2(1.0 + ((c * avg) / (double)informacionColeccionDocs.getNumTotalPalSinParada()));
+
+                        wid = (log2(1 + lambda) + ((ftd * log2(1 + lambda)) / lambda)) * (((double)ftc + 1.0) / ((double)informacionTerminoDocs.size() * (ftd + 1.0)));
+                        vSimilitud += wiq * wid;
+                    }
+                }
+            }
+        }
+        if (vSimilitud != 0.0)
+        {
+            int idDoc;
+            informacionDoc->second.getIdDoc(idDoc);
+            aux.push(make_pair(vSimilitud, idDoc));
+        }
+    }
+
+    for (int i = 0; i < numDocumentos && !aux.empty(); i++)
+    {
+        docsOrdenados.push(ResultadoRI(aux.top().first, aux.top().second, numPregunta));
+        aux.pop();
+    }
 }
-void Buscador::realizarBM25(const int &numDocumentos, const int &numPregunta) {}
+void Buscador::realizarBM25(const int &numDocumentos, const int &numPregunta)
+{
+    double vSimilitud = 0.0;
+    double idf = 0.0;
+    double ft = 0.0;     
+    double fd = 0.0;    
+    double avg = 0.0; // media en palabras (no de parada) de los documentos
+    priority_queue<pair<double, long>> aux;
+
+    avg = (double)informacionColeccionDocs.getNumTotalPalSinParada() / (double)informacionColeccionDocs.getNumDocs();
+
+    for (auto informacionDoc = indiceDocs.begin(); informacionDoc != indiceDocs.end(); ++informacionDoc)
+    {
+        // Para cada documento sacamos su similitud
+        vSimilitud = 0.0;
+        for (auto infTermPregunta = indicePregunta.begin(); infTermPregunta != indicePregunta.end(); ++infTermPregunta)
+        {
+            // Para cada termino de la pregunta lo buscamos en el indice
+            auto informacionTermino = indice.find(infTermPregunta->first);
+            // Comprobamos que no se haya acabado el indice
+            if (informacionTermino != indice.end())
+            {
+                // Sacamos la información del termino en el documento
+                unordered_map<int, InfTermDoc> informacionTerminoDocs;
+                informacionTermino->second.getL_docs(informacionTerminoDocs);
+                int idDoc;
+                informacionDoc->second.getIdDoc(idDoc);
+
+                auto infoTerminoDoc = informacionTerminoDocs.find(idDoc);
+
+                if (infoTerminoDoc != informacionTerminoDocs.end())
+                {
+                    int ft;
+                    infoTerminoDoc->second.getFt(ft);
+                    int ftc;
+                    informacionTermino->second.getFtc(ftc);
+
+                    if (ft != 0) // Si el termino aparece al menos una vez en el documento aplicamos la formula
+                    {
+                        int numSinParada;
+                        informacionDoc->second.getNumPalSinParada(numSinParada);
+                        idf = log2(((double)informacionColeccionDocs.getNumDocs() - (double) informacionTerminoDocs.size() + 0.5) / ((double)informacionTerminoDocs.size() + 0.5));
+                        fd = (ft * (k1 + 1.0)) / (ft + k1 *(1.0 - b + (b *abs((double)numSinParada/ avg))));
+                        vSimilitud += idf * fd;
+                    }
+                }
+            }
+        }
+        if (vSimilitud != 0.0)
+        {
+            int idDoc;
+            informacionDoc->second.getIdDoc(idDoc);
+            aux.push(make_pair(vSimilitud, idDoc));
+        }
+    }
+
+    for (int i = 0; i < numDocumentos && !aux.empty(); i++)
+    {
+        docsOrdenados.push(ResultadoRI(aux.top().first, aux.top().second, numPregunta));
+        aux.pop();
+    }
+}
 void Buscador::ImprimirResultadoBusqueda(const int &numDocumentos) const {}
 bool Buscador::ImprimirResultadoBusqueda(const int &numDocumentos, const string &nombreFichero) const {}
 
