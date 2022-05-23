@@ -214,8 +214,7 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
 
                 if (infoTerminoDoc != informacionTerminoDocs.end())
                 {
-                    int ft;
-                    infoTerminoDoc->second.getFt(ft);
+                    int ft = infTermPregunta->second.getFt();
                     int ftc;
                     informacionTermino->second.getFtc(ftc);
 
@@ -223,12 +222,17 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
                     {
                         // cout << "Realizando calculo" << endl;
                         //  Sacamos el peso en la query del termino i de la query q
+                        //cout << ft << " " << ftc << endl;
                         wiq = (double)ft / (double)infPregunta.getNumTotalPal();
+
                         lambda = (double)ftc / (double)informacionColeccionDocs.getNumDocs();
+
                         ftd = ft * log2(1.0 + ((c * avg) / (double)informacionColeccionDocs.getNumTotalPalSinParada()));
 
-                        wid = (log2(1 + lambda) + ((ftd * log2(1 + lambda)) / lambda)) * (((double)ftc + 1.0) / ((double)informacionTerminoDocs.size() * (ftd + 1.0)));
+                        wid = (log2(1 + lambda) + ((ftd * log2(1 + lambda)) / lambda)) *
+                              (((double)ftc + 1.0) / ((double)informacionTerminoDocs.size() * (ftd + 1.0)));
                         vSimilitud += wiq * wid;
+                        //cout << vSimilitud << endl;
                     }
                 }
             }
