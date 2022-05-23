@@ -228,7 +228,7 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
                         ftd = ft * log2(1.0 + ((c * avg) / (double)informacionColeccionDocs.getNumTotalPalSinParada()));
 
                         wid = (log2(1 + lambda) + ((ftd * log2(1 + lambda)) / lambda)) * (((double)ftc + 1.0) / ((double)informacionTerminoDocs.size() * (ftd + 1.0)));
-                        vSimilitud += wiq * wid + 0.5;
+                        vSimilitud += wiq * wid;
                     }
                 }
             }
