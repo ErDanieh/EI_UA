@@ -30,16 +30,20 @@ ostream &operator<<(std::ostream &os, const ResultadoRI &resultado)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Buscador
 
-Buscador::Buscador(const std::string &directorioIndexacion, const int &f) : IndexadorHash(directorioIndexacion),
-                                                                            formSimilitud(0),
-                                                                            c(2),
-                                                                            k1(1.2),
-                                                                            b(0.75)
+Buscador::Buscador(const string &directorioIndexacion, const int &f) : IndexadorHash(directorioIndexacion)
 {
+    formSimilitud = f;
+    c = 2;
+    k1 = 1.2;
+    b = 0.75;
 }
 
 Buscador::Buscador() : IndexadorHash()
 {
+    formSimilitud = 0;
+    c = 2;
+    k1 = 1.2;
+    b = 0.75;
 }
 
 Buscador::~Buscador()
@@ -107,14 +111,21 @@ bool Buscador::SeleccionarMetodo(const int &numDocumentos, const int &numPregunt
 {
     // Tenemos que comprobar que el indice de preguntas no esta vacio
     // En el caso de que este vacio no podemos realizar la busqueda y devolvemos false
-    if (getIndicePregunta().empty())
+    if (indicePregunta.empty())
         return false;
     else
     {
+        // cout << "Seleccionando metodo de busqueda...\n";
         if (this->formSimilitud == 0)
+        {
+            // cout << "Metodo de busqueda: DFR\n";
             realizarDFR(numDocumentos, numPregunta);
+        }
         else
+        {
+            // cout << "Metodo de busqueda: BM25\n";
             realizarBM25(numDocumentos, numPregunta);
+        }
         return true;
     }
 }
@@ -179,9 +190,12 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
 
     avg = (double)informacionColeccionDocs.getNumTotalPalSinParada() / (double)informacionColeccionDocs.getNumDocs();
 
+    // cout << "Calculando similitud...\n";
+    // cout << indiceDocs.size() << " documentos indexados\n";
     for (auto informacionDoc = indiceDocs.begin(); informacionDoc != indiceDocs.end(); ++informacionDoc)
     {
-        // Para cada documento sacamos su similitud
+        // cout << "Calculando similitud para el documento " << informacionDoc->first << "\n";
+        //  Para cada documento sacamos su similitud
         vSimilitud = 0.0;
         for (auto infTermPregunta = indicePregunta.begin(); infTermPregunta != indicePregunta.end(); ++infTermPregunta)
         {
@@ -207,13 +221,14 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
 
                     if (ft != 0) // Si el termino aparece al menos una vez en el documento aplicamos la formula
                     {
-                        // Sacamos el peso en la query del termino i de la query q
+                        // cout << "Realizando calculo" << endl;
+                        //  Sacamos el peso en la query del termino i de la query q
                         wiq = (double)ft / (double)infPregunta.getNumTotalPal();
                         lambda = (double)ftc / (double)informacionColeccionDocs.getNumDocs();
                         ftd = ft * log2(1.0 + ((c * avg) / (double)informacionColeccionDocs.getNumTotalPalSinParada()));
 
                         wid = (log2(1 + lambda) + ((ftd * log2(1 + lambda)) / lambda)) * (((double)ftc + 1.0) / ((double)informacionTerminoDocs.size() * (ftd + 1.0)));
-                        vSimilitud += wiq * wid;
+                        vSimilitud += wiq * wid + 0.5;
                     }
                 }
             }
@@ -229,6 +244,7 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
     for (int i = 0; i < numDocumentos && !aux.empty(); i++)
     {
         docsOrdenados.push(ResultadoRI(aux.top().first, aux.top().second, numPregunta));
+
         aux.pop();
     }
 }
@@ -236,8 +252,8 @@ void Buscador::realizarBM25(const int &numDocumentos, const int &numPregunta)
 {
     double vSimilitud = 0.0;
     double idf = 0.0;
-    double ft = 0.0;     
-    double fd = 0.0;    
+    double ft = 0.0;
+    double fd = 0.0;
     double avg = 0.0; // media en palabras (no de parada) de los documentos
     priority_queue<pair<double, long>> aux;
 
@@ -273,8 +289,8 @@ void Buscador::realizarBM25(const int &numDocumentos, const int &numPregunta)
                     {
                         int numSinParada;
                         informacionDoc->second.getNumPalSinParada(numSinParada);
-                        idf = log2(((double)informacionColeccionDocs.getNumDocs() - (double) informacionTerminoDocs.size() + 0.5) / ((double)informacionTerminoDocs.size() + 0.5));
-                        fd = (ft * (k1 + 1.0)) / (ft + k1 *(1.0 - b + (b *abs((double)numSinParada/ avg))));
+                        idf = log2(((double)informacionColeccionDocs.getNumDocs() - (double)informacionTerminoDocs.size() + 0.5) / ((double)informacionTerminoDocs.size() + 0.5));
+                        fd = (ft * (k1 + 1.0)) / (ft + k1 * (1.0 - b + (b * abs((double)numSinParada / avg))));
                         vSimilitud += idf * fd;
                     }
                 }
@@ -294,7 +310,83 @@ void Buscador::realizarBM25(const int &numDocumentos, const int &numPregunta)
         aux.pop();
     }
 }
-void Buscador::ImprimirResultadoBusqueda(const int &numDocumentos) const {}
+
+string Buscador::sacarNombreDocId(const long int &idDoc) const
+{
+    string rutaFichero;
+    bool encontrado = false;
+    for (auto informacionDoc = indiceDocs.begin(); informacionDoc != indiceDocs.end() && !encontrado; ++informacionDoc)
+    {
+        int auxIdDoc;
+        informacionDoc->second.getIdDoc(auxIdDoc);
+        if (auxIdDoc == idDoc)
+        {
+            rutaFichero = informacionDoc->first;
+            encontrado = true;
+        }
+    }
+
+    if (encontrado)
+    {
+        string::size_type pos = rutaFichero.find_last_of("/");
+        pos++;
+        if (pos == string::npos)
+            pos = 0;
+        string::size_type pos2 = rutaFichero.find_first_of(".", pos);
+        return rutaFichero.substr(pos, pos2 - pos);
+    }
+    else
+        return "";
+}
+
+void Buscador::ImprimirResultadoBusqueda(const int &numDocumentos) const
+{
+    string impresion;
+    priority_queue<ResultadoRI> documentos(this->docsOrdenados);
+    int aux;
+    while (!documentos.empty())
+    {
+        aux = documentos.top().NumPregunta();
+        for (int i = 0; i < numDocumentos; i++)
+        {
+            if (documentos.top().NumPregunta() != aux || documentos.empty())
+            {
+                break;
+            }
+            else
+            {
+                aux = documentos.top().NumPregunta();
+                impresion += to_string(aux);
+                impresion += " ";
+                if (!formSimilitud)
+                {
+                    impresion += "DFR ";
+                }
+                else
+                {
+                    impresion += "BM25 ";
+                }
+                impresion += sacarNombreDocId(documentos.top().IdDoc()) + " ";
+                impresion += to_string(i) + " ";
+                impresion += to_string(documentos.top().VSimilitud()) + " ";
+                if (documentos.top().NumPregunta() == 0)
+                {
+                    string preg;
+                    if (DevuelvePregunta(preg))
+                        impresion += preg + "\n";
+                    else
+                        impresion += "\n";
+                }
+                else
+                {
+                    impresion += "ConjuntoDePreguntas\n";
+                }
+            }
+            documentos.pop();
+        }
+    }
+    cout << impresion;
+}
 bool Buscador::ImprimirResultadoBusqueda(const int &numDocumentos, const string &nombreFichero) const {}
 
 ostream &operator<<(ostream &s, const Buscador &p)

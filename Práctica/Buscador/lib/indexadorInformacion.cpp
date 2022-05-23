@@ -95,6 +95,13 @@ InformacionTermino::InformacionTermino(const InformacionTermino &t)
     this->l_docs = t.l_docs;
 }
 
+InformacionTermino::InformacionTermino(const int &ftc, pair<int, InfTermDoc> &p)
+{
+    this->ftc = ftc;
+    this->l_docs.insert(p);
+}
+
+
 InformacionTermino::~InformacionTermino()
 {
     this->ftc = 0;
@@ -120,9 +127,9 @@ void InformacionTermino::setFtc(int ftc)
     this->ftc = ftc;
 }
 
-void InformacionTermino::insertarDoc(int &idDoc, InfTermDoc &infTermDoc)
+void InformacionTermino::insertarDoc( pair<int, InfTermDoc> &p)
 {
-    l_docs.insert({idDoc, infTermDoc});
+    this->l_docs.insert(p);
 }
 
 InfTermDoc InformacionTermino::getInfTermDoc(int &idDoc)
@@ -134,6 +141,7 @@ void InformacionTermino::getL_docs(unordered_map<int, InfTermDoc> &d) const
 {
     d = this->l_docs;
 }
+
 
 ostream &operator<<(ostream &os, const InformacionTermino &t)
 {
@@ -154,6 +162,12 @@ InfTermDoc::InfTermDoc(const InfTermDoc &t)
 {
     this->ft = t.ft;
     this->posTerm = t.posTerm;
+}
+
+InfTermDoc::InfTermDoc(const int &ft, const int &posTerm)
+{
+    this->ft = ft;
+    this->posTerm.push_back(posTerm);
 }
 
 InfTermDoc::~InfTermDoc()
@@ -183,7 +197,7 @@ void InfTermDoc::getPosTerm(list<int> &p) const
     p = this->posTerm;
 }
 
-void InfTermDoc::setFt(int ft)
+void InfTermDoc::setFt(const int &ft)
 {
     this->ft = ft;
 }

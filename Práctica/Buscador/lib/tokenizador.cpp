@@ -61,39 +61,16 @@ void Tokenizador::EliminarRepetidos(string &delimitadoresPalabra)
     delimitadoresPalabra = delimitadores;
 }
 
-static const std::map<int, char> mymap = { { -1, 'y' }, { -3, 'y' },
-		{ -4, 'u' }, { -5, 'u' }, { -6, 'u' }, { -7, 'u' }, { -8, 'o' }, { -10,
-				'o' }, { -11, 'o' }, { -12, 'o' }, { -13, 'o' }, { -14, 'o' }, {
-				-15, 'ñ' }, { -16, 'o' }, { -17, 'i' }, { -18, 'i' },
-		{ -19, 'i' }, { -20, 'i' }, { -21, 'e' }, { -22, 'e' }, { -23, 'e' }, {
-				-24, 'e' }, { -25, 'c' }, { -27, 'a' }, { -21, 'e' },
-		{ -25, 'a' }, { -27, 'a' }, { -28, 'a' }, { -29, 'a' }, { -30, 'a' }, {
-				-31, 'a' }, { -32, 'a' }, { -35, 'y' }, { -36, 'u' },
-		{ -37, 'u' }, { -38, 'u' }, { -39, 'u' }, { -40, 'o' }, { -42, 'o' }, {
-				-43, 'o' }, { -44, 'o' }, { -45, 'o' }, { -46, 'o' },
-		{ -47, 'ñ' }, { -49, 'i' }, { -50, 'i' }, { -51, 'i' }, { -52, 'i' }, {
-				-53, 'e' }, { -54, 'e' }, { -55, 'e' }, { -56, 'e' },
-		{ -57, 'c' }, { -59, 'a' }, { -60, 'a' }, { -61, 'a' }, { -62, 'a' }, {
-				-63, 'a' }, { -64, 'a' } };
-
-string Tokenizador::normalizaAcentosMinusculas(const string &str) const
+string Tokenizador::normalizaAcentosMinusculas(const string &palabra) const
 {
 
-    std::locale loc;
-    string noaccent = "";
-    for (std::string::size_type i = 0; i < str.length(); ++i)
-    {
-        if (mymap.find((int)str[i])->second != NULL)
-        { // TODO Optimizar
-            // cout<<mymap.find((int) str[i])->second<<endl;
-            noaccent.push_back(mymap.find((int)str[i])->second);
-        }
-        else
-        {
-            noaccent.push_back(std::tolower(str[i], loc));
-        }
-    }
-    return noaccent;
+    string palabraAux = palabra;
+    char ISO[260]= "                                 !\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[ ]^_`abcdefghijklmnopqrstuvwxyz{|}~ ? ,                                                            �aaaaaa ceeeeiiii  ooooo  uuuuy  aaaaaa ceeeeiiii  ooooo  uuuuy y";
+    ISO[241]= ISO[209]= '�';
+    for (int i = 0; i < palabraAux.size(); i++)
+        palabraAux[i] = ISO[(unsigned char)palabra[i]];
+    
+    return palabraAux;
 }
 
 void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const

@@ -28,14 +28,17 @@ public:
     InfTermDoc(); // Inicializa ft = 0
     // Destructor de informacionTermino
     ~InfTermDoc(); // Pone ft = 0
+
+    InfTermDoc(const int &frec, const int &pos);
+
     // Operador igual para asignar los mismos valores de una informacionTermino a otra
     InfTermDoc &operator=(const InfTermDoc &);
     // Getters
     void getFt(int &) const;
     void getPosTerm(list<int> &) const;
     // Setters
-    void setFt(int ft);
-    void setPosTerm(int &posTerm);
+    void setFt(const int &);
+    void setPosTerm(int &);
 
 private:
     // Frecuencia del termino en el documento
@@ -62,6 +65,8 @@ public:
     InformacionTermino();
     // Destructor de informacionTermino pone ftc = 0 y vaci­a l_docs
     ~InformacionTermino();
+
+    InformacionTermino(const int &ftc, pair<int, InfTermDoc> &);
     // Operador igual para asignar los mismos valores de una informacionTermino a otra
     InformacionTermino &operator=(const InformacionTermino &);
 
@@ -77,23 +82,31 @@ public:
     void setFtc(int ftc);
 
     // Inserta un nuevo documento en la tabla hash segun su id
-    void insertarDoc(int &idDoc, InfTermDoc &infTermDoc);
+    void insertarDoc(pair<int, InfTermDoc> &);
 
     // Devuelve la informacion del documento pasado como parametro
     InfTermDoc getInfTermDoc(int &idDoc);
 
     // Devuelve la informacion de los termnos en el documento
-    void getL_docs(unordered_map<int, InfTermDoc> &d) const ;
+    void getL_docs(unordered_map<int, InfTermDoc> &d) const;
 
-    void setL_docs(unordered_map<int, InfTermDoc> &l_docs)
+    void setL_docs(const unordered_map<int, InfTermDoc> l_docs)
     {
         this->l_docs = l_docs;
     };
-    void modificarDoc(int &idDoc, int &ft, int &posTerm)
+
+    void modificarDoc(const int &idDoc, int &posTerm)
     {
-        l_docs.find(idDoc)->second.setFt(ft);
-        l_docs.find(idDoc)->second.setPosTerm(posTerm);
+        l_docs[idDoc].setPosTerm(posTerm);
     };
+
+    void incrementarFt(const int &idDoc)
+    {
+        int ft;
+        l_docs[idDoc].getFt(ft);
+        l_docs[idDoc].setFt(ft + 1);
+    };
+
     void imprimirL_docs()
     {
         for (auto it = l_docs.begin(); it != l_docs.end(); ++it)
@@ -102,7 +115,10 @@ public:
         }
     };
 
-    
+    bool existeDocu(const int &idDoc) const
+    {
+        return l_docs.find(idDoc) != l_docs.end();
+    };
 
 private:
     // Frecuencia total del termino en la coleccion

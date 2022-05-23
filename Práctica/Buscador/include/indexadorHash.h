@@ -43,6 +43,12 @@ public:
     IndexadorHash(const IndexadorHash &);
 
     /**
+     * @brief Construct a new Indexador Hash object 
+     * Lo necesitamos para el buscador
+     */
+    IndexadorHash();
+
+    /**
      * @brief Destroy the Indexador Hash object
      *
      */
@@ -150,18 +156,6 @@ public:
 
     // Para cada uno de nuestros Indexadores tendremos nuestro objeto stemmer
     stemmerPorter stemmerIndexador;
-
-    /**
-    * @brief Este constructor se pone en la parte privada porque no se permitirá
-    crear un indexador sin inicializarlo convenientemente.
-    */
-    IndexadorHash();
-
-    tr1::unordered_map<string, InformacionTermino> getIndice() const { return this->indice; }
-
-    tr1::unordered_map<string, InfDoc> getIndiceDocs() const { return this->indiceDocs; };
-
-    tr1::unordered_map<string, InformacionTerminoPregunta> getIndicePregunta() const { return this->indicePregunta; };
 
 private:
     // Índice de términos indexados accesible por el término

@@ -74,5 +74,7 @@ private:
     double c;
     double k1;
     double b;
+
+    string sacarNombreDocId(const long int &idDoc) const;
 };
 #endif

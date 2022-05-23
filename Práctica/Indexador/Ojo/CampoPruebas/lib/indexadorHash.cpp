@@ -13,6 +13,25 @@ ostream &operator<<(ostream &s, const IndexadorHash &p)
     return s;
 }
 
+IndexadorHash::IndexadorHash() : tok()
+{
+    this->ficheroStopWords= "";
+    this->tipoStemmer= 0;
+    this->stopWords.clear();
+
+    this->directorioIndice= "./"; // Directorio raiz
+    this->almacenarEnDisco= false;
+    this->almacenarPosTerm= false;
+    
+    this->indiceDisco.clear();
+    this->indiceDocsDisco.clear();
+    this->indice.clear();
+    this->indiceDocs.clear();
+    this->indicePregunta.clear();
+    this->infPregunta.~InformacionPregunta();
+    this->informacionColeccionDocs.~InfColeccionDocs();
+}
+
 // Constructor de la clase IndexadorHash que inicializa los atributos de la clase
 IndexadorHash::IndexadorHash(const string &fichStopWords, const string &delimitadores,
                              const bool &detectComp, const bool &minuscSinAcentos, const string &dirIndice,

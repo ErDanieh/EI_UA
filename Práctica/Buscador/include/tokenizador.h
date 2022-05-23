@@ -108,13 +108,6 @@ private:
      */
     void EliminarRepetidos(string &delimitadoresPalabra);
 
-    /**
-     * @brief Transforma una cadena de caracteres a min�sculas y sin acentos
-     *
-     * @param cadena Cadena para transformar
-     */
-    string normalizaAcentosMinusculas(const string &palabra) const;
-
     string eliminaBarraN(const string &i);
 
     /**
@@ -147,6 +140,12 @@ private:
                       int &numPuntoIzquierda, int &numPuntosDerecha, int &numGuionesDerecha, int &numArrobas, int &casoAnterior) const;
 
 public:
+    /**
+     * @brief Transforma una cadena de caracteres a min�sculas y sin acentos
+     *
+     * @param cadena Cadena para transformar
+     */
+    string normalizaAcentosMinusculas(const string &palabra) const;
     static const string delimiters_Siempre;
 
     /**
