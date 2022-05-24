@@ -391,7 +391,64 @@ void Buscador::ImprimirResultadoBusqueda(const int &numDocumentos) const
     }
     cout << impresion;
 }
-bool Buscador::ImprimirResultadoBusqueda(const int &numDocumentos, const string &nombreFichero) const {}
+bool Buscador::ImprimirResultadoBusqueda(const int &numDocumentos, const string &nombreFichero) const
+{
+    ofstream ficheroEscribo(nombreFichero.c_str());
+    if (ficheroEscribo)
+    {
+        string impresion;
+        priority_queue<ResultadoRI> documentos(this->docsOrdenados);
+        int aux;
+        while (!documentos.empty())
+        {
+            aux = documentos.top().NumPregunta();
+            for (int i = 0; i < numDocumentos; i++)
+            {
+                if (documentos.top().NumPregunta() != aux || documentos.empty())
+                {
+                    break;
+                }
+                else
+                {
+                    aux = documentos.top().NumPregunta();
+                    impresion += to_string(aux);
+                    impresion += " ";
+                    if (!formSimilitud)
+                    {
+                        impresion += "DFR ";
+                    }
+                    else
+                    {
+                        impresion += "BM25 ";
+                    }
+                    impresion += sacarNombreDocId(documentos.top().IdDoc()) + " ";
+                    impresion += to_string(i) + " ";
+                    impresion += to_string(documentos.top().VSimilitud()) + " ";
+                    if (documentos.top().NumPregunta() == 0)
+                    {
+                        string preg;
+                        if (DevuelvePregunta(preg))
+                            impresion += preg + "\n";
+                        else
+                            impresion += "\n";
+                    }
+                    else
+                    {
+                        impresion += "ConjuntoDePreguntas\n";
+                    }
+                }
+                documentos.pop();
+            }
+        }
+        ficheroEscribo << impresion;
+        ficheroEscribo.close();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 ostream &operator<<(ostream &s, const Buscador &p)
 {
