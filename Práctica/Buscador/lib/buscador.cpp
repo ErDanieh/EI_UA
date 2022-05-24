@@ -179,64 +179,56 @@ bool Buscador::Buscar(const string &dirPreguntas, const int &numDocumentos, cons
 void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
 {
     double vSimilitud = 0.0;
-    double wiq = 0.0;    // peso en la query del termino i de la query q
-    double wid = 0.0;    // peso en el documento del término i de la query q
-    double ft = 0.0;     // número total de veces que el término t aparece en toda la colección
-    double ftd = 0.0;    // número de veces que el término t aparece en el documento d
+    int k = infPregunta.getNumTotalPalSinParada();
+    double wiq = 0.0; // peso en la query del termino i de la query q
+    double wid = 0.0; // peso en el documento del término i de la query q
+    int nt = 0;       // numero de documentos en el que aparece el termino i de la query q
+    int ft = 0.0;     // número total de veces que el término t aparece en toda la colección
+    int ftd = 0.0;    // número de veces que el término t aparece en el documento d
+    double ftq = 0.0;
     double lambda = 0.0; // es la razón entre la frecuencia del término en la colección y la cantidad de documentos en la colección
     double first = 0.0;
     double avg = 0.0; // media en palabras (no de parada) de los documentos
+    int ld = 0.0;     // numero de palabras sin parada del documento
     priority_queue<pair<double, long>> aux;
 
-    avg = (double)informacionColeccionDocs.getNumTotalPalSinParada() / (double)informacionColeccionDocs.getNumDocs();
+    avg = 1.0 * (double)informacionColeccionDocs.getNumTotalPalSinParada() / (double)informacionColeccionDocs.getNumDocs();
 
     // cout << "Calculando similitud...\n";
     // cout << indiceDocs.size() << " documentos indexados\n";
     for (auto informacionDoc = indiceDocs.begin(); informacionDoc != indiceDocs.end(); ++informacionDoc)
     {
+        informacionDoc->second.getNumPalSinParada(ld);
         // cout << "Calculando similitud para el documento " << informacionDoc->first << "\n";
         //  Para cada documento sacamos su similitud
         vSimilitud = 0.0;
-        for (auto infTermPregunta = indicePregunta.begin(); infTermPregunta != indicePregunta.end(); ++infTermPregunta)
+
+        for (auto terminoPregunta = indicePregunta.begin(); terminoPregunta != indicePregunta.end(); ++terminoPregunta)
         {
-            // Para cada termino de la pregunta lo buscamos en el indice
-            auto informacionTermino = indice.find(infTermPregunta->first);
-            // Comprobamos que no se haya acabado el indice
-            if (informacionTermino != indice.end())
+            ftq = terminoPregunta->second.getFt();
+            wiq = 1.0 * (double)ftq / k;
+
+            // Hay que sacar el id del documento, buscarlo en el indice de documentos y sacar ft del termino en el documento
+            unordered_map<int, InfTermDoc> todoDocumentosAparece;
+            indice[terminoPregunta->first].getL_docs(todoDocumentosAparece);
+            int idDoc;
+            informacionDoc->second.getIdDoc(idDoc);
+            todoDocumentosAparece[idDoc].getFt(ftd);
+            indice[terminoPregunta->first].getFtc(ft);
+            nt = todoDocumentosAparece.size();
+
+            if (ftd == 0 || ft == 0 || nt == 0)
             {
-                // Sacamos la información del termino en el documento
-                unordered_map<int, InfTermDoc> informacionTerminoDocs;
-                informacionTermino->second.getL_docs(informacionTerminoDocs);
-                int idDoc;
-                informacionDoc->second.getIdDoc(idDoc);
-
-                auto infoTerminoDoc = informacionTerminoDocs.find(idDoc);
-
-                if (infoTerminoDoc != informacionTerminoDocs.end())
-                {
-                    int ft = infTermPregunta->second.getFt();
-                    int ftc;
-                    informacionTermino->second.getFtc(ftc);
-
-                    if (ft != 0) // Si el termino aparece al menos una vez en el documento aplicamos la formula
-                    {
-                        // cout << "Realizando calculo" << endl;
-                        //  Sacamos el peso en la query del termino i de la query q
-                        //cout << ft << " " << ftc << endl;
-                        wiq = (double)ft / (double)infPregunta.getNumTotalPal();
-
-                        lambda = (double)ftc / (double)informacionColeccionDocs.getNumDocs();
-
-                        ftd = ft * log2(1.0 + ((c * avg) / (double)informacionColeccionDocs.getNumTotalPalSinParada()));
-
-                        wid = (log2(1 + lambda) + ((ftd * log2(1 + lambda)) / lambda)) *
-                              (((double)ftc + 1.0) / ((double)informacionTerminoDocs.size() * (ftd + 1.0)));
-                        vSimilitud += wiq * wid;
-                        //cout << vSimilitud << endl;
-                    }
-                }
+            }
+            else
+            {
+                double lambda = 1.0 * ft / indiceDocs.size();
+                double ftdd = (double)ftd * log2(1.0 + (c * avg) / ld);
+                wid = (log2(1.0 + lambda) + ftdd * log2((1.0 + lambda)/(lambda))) * ((ft +1) /(nt *(ftdd + 1)));
+                vSimilitud += wiq * wid;
             }
         }
+
         if (vSimilitud != 0.0)
         {
             int idDoc;
