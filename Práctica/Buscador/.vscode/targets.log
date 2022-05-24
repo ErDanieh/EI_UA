@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon May 23 09:27:25 2022
+# Make data base, printed on Tue May 24 12:36:26 2022
 
 # Variables
 
@@ -53,7 +53,7 @@ SNAP_DATA = /var/snap/code/97
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:47974
+JOURNAL_STREAM = 8:54309
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
@@ -85,11 +85,11 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 _ = /snap/code/97/usr/share/code/code
 # environment
-MANAGERPID = 2187
+MANAGERPID = 2248
 # environment
 P9K_SSH = 0
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-603dad59-d6e4-4ce6-808d-173635ec2daa.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-b2b1f0bf-7da3-4cf9-a3d6-b810fa4b985a.sock
 # environment
 LC_NAME = es_ES.UTF-8
 # environment
@@ -105,7 +105,7 @@ GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
-SESSION_MANAGER = local/daniel-ASUS-TUF-Dash-F15-FX516PM-FX516PM:@/tmp/.ICE-unix/2431,unix/daniel-ASUS-TUF-Dash-F15-FX516PM-FX516PM:/tmp/.ICE-unix/2431
+SESSION_MANAGER = local/daniel-ASUS-TUF-Dash-F15-FX516PM-FX516PM:@/tmp/.ICE-unix/2480,unix/daniel-ASUS-TUF-Dash-F15-FX516PM-FX516PM:/tmp/.ICE-unix/2480
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -123,10 +123,11 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = a7f2abb6a0b045e6ba475994819c8109
+INVOCATION_ID = 1965860ee4844ee2a7a7aed15e74c35c
 # environment
 GDK_PIXBUF_MODULEDIR = /snap/code/97/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
+ 
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
 ELECTRON_NO_ATTACH_CONSOLE = 1
@@ -137,7 +138,7 @@ XDG_SESSION_DESKTOP = ubuntu
 # environment
 SSH_AUTH_SOCK = /run/user/1000/keyring/ssh
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 5152
+GIO_LAUNCHED_DESKTOP_FILE_PID = 52077
 # automatic
 %F = $(notdir $%)
 # environment
@@ -151,7 +152,7 @@ PWD = /home/daniel/Desktop/EI_UA/Práctica/Buscador
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 2393
+SSH_AGENT_PID = 2442
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -253,6 +254,8 @@ GDK_BACKEND = x11
 # environment
 LC_PAPER = es_ES.UTF-8
 # environment
+NO_AT_BRIDGE = 1
+# environment
 LC_IDENTIFICATION = es_ES.UTF-8
 # environment
 QT_ACCESSIBILITY = 1
@@ -278,7 +281,6 @@ GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 ^F = $(notdir $^)
 # makefile (from 'makefile', line 8)
 _OBJ = buscador.o indexadorHash.o tokenizador.o stemmer.o indexadorInformacion.o
- 
 # default
 SUFFIXES := 
 # environment
@@ -298,11 +300,11 @@ LC_ADDRESS = es_ES.UTF-8
 # environment
 LANG = C
 # environment
-VSCODE_PID = 5352
+VSCODE_PID = 15775
 # environment
 NVM_RC_VERSION = 
 # variable set hash-table stats:
-# Load=145/1024=14%, Rehash=0, Collisions=31/176=18%
+# Load=146/1024=14%, Rehash=0, Collisions=33/184=18%
 
 # Pattern-specific Variable Values
 
@@ -310,11 +312,11 @@ NVM_RC_VERSION =
 
 # Directories
 
-# lib (device 66310, inode 5116266): 11 files, no impossibilities so far.
-# include (device 66310, inode 5116261): 7 files, no impossibilities so far.
-# . (device 66310, inode 4601944): 28 files, no impossibilities.
+# lib (device 66310, inode 5116266): 4 files, no impossibilities so far.
+# include (device 66310, inode 5116261): 2 files, no impossibilities so far.
+# . (device 66310, inode 4601944): 27 files, no impossibilities.
 
-# 46 files, no impossibilities in 3 directories.
+# 33 files, no impossibilities in 3 directories.
 
 # Implicit Rules
 
@@ -327,56 +329,40 @@ lib/%.o: lib/%.cpp include/%.h
 # Files
 
 # Not a target:
-lib/indexadorHash.cpp:
-#  Implicit rule search has been done.
-#  Last modified 2022-05-18 10:34:35.062988554
-#  File has been updated.
-#  Successfully updated.
-
-# Not a target:
-include/tokenizador.h:
-#  Implicit rule search has been done.
-#  Last modified 2022-04-23 13:04:07.384522
-#  File has been updated.
-#  Successfully updated.
-
-lib/indexadorInformacion.o: lib/indexadorInformacion.cpp include/indexadorInformacion.h
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: 'indexadorInformacion'
-#  Last modified 2022-05-21 10:07:30.815851033
-#  File has been updated.
-#  Successfully updated.
-#  recipe to execute (from 'makefile', line 17):
-	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<
+lib/indexadorInformacion.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 all: buscador
 #  Command line target.
 #  Implicit rule search has been done.
 #  File does not exist.
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/7=0%
 
-lib/stemmer.o: lib/stemmer.cpp include/stemmer.h
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: 'stemmer'
-#  Last modified 2022-05-21 10:07:29.911849348
-#  File has been updated.
-#  Successfully updated.
-#  recipe to execute (from 'makefile', line 17):
-	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<
+# Not a target:
+lib/stemmer.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 buscador: src/main.cpp lib/buscador.o lib/indexadorHash.o lib/tokenizador.o lib/stemmer.o lib/indexadorInformacion.o
 #  Implicit rule search has not been done.
-#  Last modified 2022-05-22 16:43:10.587310516
+#  File does not exist.
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/7=0%
 #  recipe to execute (from 'makefile', line 14):
 	$(CC) $(OPTIONS) $(DEBUG) -I$(INCLUDEDIR) src/main.cpp $(OBJ) -o buscador
 
 # Not a target:
 lib/buscador.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-22 16:42:48.619220579
+#  Last modified 2022-05-24 12:31:21.892717419
 #  File has been updated.
 #  Successfully updated.
 
@@ -388,54 +374,16 @@ makefile:
 #  Successfully updated.
 
 # Not a target:
-include/indexadorInformacion.h:
-#  Implicit rule search has been done.
-#  Last modified 2022-04-27 14:43:44.10602
-#  File has been updated.
-#  Successfully updated.
-
-# Not a target:
-lib/tokenizador.cpp:
-#  Implicit rule search has been done.
-#  Last modified 2022-04-27 13:21:53.982538
-#  File has been updated.
-#  Successfully updated.
-
-# Not a target:
-include/stemmer.h:
-#  Implicit rule search has been done.
-#  Last modified 2022-04-22 22:17:30.28508
-#  File has been updated.
-#  Successfully updated.
-
-lib/indexadorHash.o: lib/indexadorHash.cpp include/indexadorHash.h
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: 'indexadorHash'
-#  Last modified 2022-05-21 10:37:33.8310662
-#  File has been updated.
-#  Successfully updated.
-#  recipe to execute (from 'makefile', line 17):
-	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<
+lib/indexadorHash.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 .DEFAULT:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-
-# Not a target:
-lib/indexadorInformacion.cpp:
-#  Implicit rule search has been done.
-#  Last modified 2022-04-27 14:44:14.065923
-#  File has been updated.
-#  Successfully updated.
-
-# Not a target:
-lib/stemmer.cpp:
-#  Implicit rule search has been done.
-#  Last modified 2022-04-22 22:17:30.28908
-#  File has been updated.
-#  Successfully updated.
 
 clean:
 #  Implicit rule search has not been done.
@@ -444,59 +392,69 @@ clean:
 #  recipe to execute (from 'makefile', line 20):
 	rm -f $(OBJ) 
 
-# Not a target:
-include/indexadorHash.h:
-#  Implicit rule search has been done.
-#  Last modified 2022-05-21 10:37:16.435004618
-#  File has been updated.
-#  Successfully updated.
-
 lib/buscador.o: lib/buscador.cpp include/buscador.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'buscador'
-#  Last modified 2022-05-22 16:43:09.643306652
+#  Last modified 2022-05-24 12:31:03.756646482
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := lib/buscador.o
+# automatic
+# % := 
+# automatic
+# * := buscador
+# automatic
+# + := lib/buscador.cpp include/buscador.h
+# automatic
+ 
+# | := 
+# automatic
+# < := lib/buscador.cpp
+ 
+# automatic
+# ^ := lib/buscador.cpp include/buscador.h
+# automatic
+# ? := lib/buscador.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
 #  recipe to execute (from 'makefile', line 17):
 	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<
 
 # Not a target:
 src/main.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-22 16:39:16.794349676
+#  Last modified 2022-05-24 12:30:24.088491255
 #  File has been updated.
 #  Successfully updated.
 
-lib/tokenizador.o: lib/tokenizador.cpp include/tokenizador.h
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: 'tokenizador'
-#  Last modified 2022-05-21 10:07:29.475848532
-#  File has been updated.
-#  Successfully updated.
-#  recipe to execute (from 'makefile', line 17):
-	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<
+# Not a target:
+lib/tokenizador.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 include/buscador.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-21 10:35:58.522714624
+#  Last modified 2022-05-23 10:31:36.763078716
 #  File has been updated.
 #  Successfully updated.
 
 # files hash-table stats:
-# Load=22/1024=2%, Rehash=0, Collisions=0/66=0%
+# Load=14/1024=1%, Rehash=0, Collisions=0/38=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 71 / storage = 1104 B / avg = 15 B
-# current buf: size = 8162 B / used = 1104 B / count = 71 / avg = 15 B
+# strcache buffers: 1 (0) / strings = 49 / storage = 710 B / avg = 14 B
+# current buf: size = 8162 B / used = 710 B / count = 49 / avg = 14 B
 
-# strcache performance: lookups = 98 / hit rate = 27%
+# strcache performance: lookups = 65 / hit rate = 24%
 # hash-table stats:
-# Load=71/8192=1%, Rehash=0, Collisions=3/98=3%
-# Finished Make data base on Mon May 23 09:27:25 2022
+# Load=49/8192=1%, Rehash=0, Collisions=1/65=2%
+# Finished Make data base on Tue May 24 12:36:26 2022
 
  

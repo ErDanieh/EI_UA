@@ -18,6 +18,7 @@ using namespace std;
  */
 class InfTermDoc
 {
+    friend class Buscador;
     // Operador salida
     friend ostream &operator<<(ostream &s, const InfTermDoc &p);
 
@@ -157,6 +158,7 @@ public:
  */
 class InfDoc
 {
+    friend class Buscador;
     friend ostream &operator<<(ostream &s, const InfDoc &p);
 
 public:
@@ -210,6 +212,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class InfColeccionDocs
 {
+    friend class Buscador;
     friend ostream &operator<<(ostream &s, const InfColeccionDocs &p);
 
 public:
