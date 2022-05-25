@@ -121,6 +121,22 @@ public:
         return l_docs.find(idDoc) != l_docs.end();
     };
 
+    int getFtDoc(const int &idDoc)
+    {
+        int ft = 0;
+        if (existeDocu(idDoc))
+        {
+            l_docs[idDoc].getFt(ft);
+            return ft;
+        }
+        
+    };
+
+    int sizeL_docs()
+    {
+        return l_docs.size();
+    };
+
 private:
     // Frecuencia total del termino en la coleccion
     int ftc;

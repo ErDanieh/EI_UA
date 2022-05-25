@@ -209,13 +209,14 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
             wiq = 1.0 * (double)ftq / k;
 
             // Hay que sacar el id del documento, buscarlo en el indice de documentos y sacar ft del termino en el documento
-            unordered_map<int, InfTermDoc> todoDocumentosAparece;
-            indice[terminoPregunta->first].getL_docs(todoDocumentosAparece);
+            //unordered_map<int, InfTermDoc> todoDocumentosAparece;
+            //indice[terminoPregunta->first].getL_docs(todoDocumentosAparece);
             int idDoc;
             informacionDoc->second.getIdDoc(idDoc);
-            todoDocumentosAparece[idDoc].getFt(ftd);
+            //todoDocumentosAparece[idDoc].getFt(ftd);
+            ftd = indice[terminoPregunta->first].getFtDoc(idDoc);
             indice[terminoPregunta->first].getFtc(ft);
-            nt = todoDocumentosAparece.size();
+            nt = indice[terminoPregunta->first].sizeL_docs();
 
             if (ftd == 0 || ft == 0 || nt == 0)
             {
@@ -267,17 +268,19 @@ void Buscador::realizarBM25(const int &numDocumentos, const int &numPregunta)
             if (informacionTermino != indice.end())
             {
                 // Sacamos la información del termino en el documento
-                unordered_map<int, InfTermDoc> informacionTerminoDocs;
-                informacionTermino->second.getL_docs(informacionTerminoDocs);
+                //unordered_map<int, InfTermDoc> informacionTerminoDocs;
+                //informacionTermino->second.getL_docs(informacionTerminoDocs);
+
                 int idDoc;
                 informacionDoc->second.getIdDoc(idDoc);
 
-                auto infoTerminoDoc = informacionTerminoDocs.find(idDoc);
+                //auto infoTerminoDoc = informacionTerminoDocs.find(idDoc);
 
-                if (infoTerminoDoc != informacionTerminoDocs.end())
+                if (informacionTermino->second.existeDocu(idDoc))
                 {
                     int ft;
-                    infoTerminoDoc->second.getFt(ft);
+                    ft = informacionTermino->second.getFtDoc(idDoc);
+
                     int ftc;
                     informacionTermino->second.getFtc(ftc);
 
@@ -285,7 +288,7 @@ void Buscador::realizarBM25(const int &numDocumentos, const int &numPregunta)
                     {
                         int numSinParada;
                         informacionDoc->second.getNumPalSinParada(numSinParada);
-                        idf = log2(((double)informacionColeccionDocs.getNumDocs() - (double)informacionTerminoDocs.size() + 0.5) / ((double)informacionTerminoDocs.size() + 0.5));
+                        idf = log2(((double)informacionColeccionDocs.getNumDocs() - (double)informacionTermino->second.sizeL_docs() + 0.5) / ((double)informacionTermino->second.sizeL_docs() + 0.5));
                         fd = (ft * (k1 + 1.0)) / (ft + k1 * (1.0 - b + (b * abs((double)numSinParada / avg))));
                         vSimilitud += idf * fd;
                     }
@@ -340,6 +343,7 @@ void Buscador::ImprimirResultadoBusqueda(const int &numDocumentos) const
     string impresion;
     priority_queue<ResultadoRI> documentos(this->docsOrdenados);
     int aux;
+    //cout << documentos.size() << endl;
     while (!documentos.empty())
     {
         aux = documentos.top().NumPregunta();
