@@ -210,10 +210,8 @@ void Buscador::realizarDFR(const int &numDocumentos, const int &numPregunta)
 
             // Hay que sacar el id del documento, buscarlo en el indice de documentos y sacar ft del termino en el documento
             //unordered_map<int, InfTermDoc> todoDocumentosAparece;
-            //indice[terminoPregunta->first].getL_docs(todoDocumentosAparece);
             int idDoc;
             informacionDoc->second.getIdDoc(idDoc);
-            //todoDocumentosAparece[idDoc].getFt(ftd);
             ftd = indice[terminoPregunta->first].getFtDoc(idDoc);
             indice[terminoPregunta->first].getFtc(ft);
             nt = indice[terminoPregunta->first].sizeL_docs();
